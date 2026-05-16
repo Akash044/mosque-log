@@ -1,0 +1,208 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/formatters.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../models/income.dart';
+import '../../../models/person.dart';
+import '../../../providers/income_provider.dart';
+import '../../../providers/person_provider.dart';
+import 'income_history_list.dart';
+
+/// Monthly payments history with Person / Month / Year filters.
+class MonthlyHistory extends ConsumerStatefulWidget {
+  const MonthlyHistory({super.key});
+
+  @override
+  ConsumerState<MonthlyHistory> createState() => _MonthlyHistoryState();
+}
+
+class _MonthlyHistoryState extends ConsumerState<MonthlyHistory> {
+  String? _personId; // null = all
+  int? _month; // 1..12, null = all
+  late int _year;
+
+  @override
+  void initState() {
+    super.initState();
+    _year = DateTime.now().year;
+  }
+
+  bool _matches(Income i) {
+    if (_personId != null && i.personId != _personId) return false;
+    final yearStr = _year.toString().padLeft(4, '0');
+    if (_month != null) {
+      final key = '$yearStr-${_month.toString().padLeft(2, '0')}';
+      return i.months.contains(key);
+    }
+    return i.months.any((m) => m.startsWith('$yearStr-'));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final incomeAsync = ref.watch(incomeProvider);
+    final personsAsync = ref.watch(personsProvider);
+
+    return Column(
+      children: [
+        _FilterBar(
+          personId: _personId,
+          month: _month,
+          year: _year,
+          personsAsync: personsAsync,
+          onPersonChanged: (id) => setState(() => _personId = id),
+          onMonthChanged: (m) => setState(() => _month = m),
+          onPrevYear: () => setState(() => _year -= 1),
+          onNextYear: () => setState(() => _year += 1),
+        ),
+        const Divider(height: 1),
+        Expanded(
+          child: incomeAsync.when(
+            loading: () =>
+                const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(child: Text(e.toString())),
+            data: (all) {
+              final items = all
+                  .where((i) => i.type == IncomeType.monthly && _matches(i))
+                  .toList()
+                ..sort((a, b) => b.date.compareTo(a.date));
+
+              if (items.isEmpty) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(l.noData),
+                  ),
+                );
+              }
+              final personsById = personsAsync.maybeWhen(
+                data: (xs) => {for (final p in xs) p.id: p},
+                orElse: () => <String, Person>{},
+              );
+              return ListView.separated(
+                padding: const EdgeInsets.only(bottom: 16),
+                itemCount: items.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (_, i) => IncomeTile(
+                  income: items[i],
+                  personsById: personsById,
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _FilterBar extends StatelessWidget {
+  const _FilterBar({
+    required this.personId,
+    required this.month,
+    required this.year,
+    required this.personsAsync,
+    required this.onPersonChanged,
+    required this.onMonthChanged,
+    required this.onPrevYear,
+    required this.onNextYear,
+  });
+
+  final String? personId;
+  final int? month;
+  final int year;
+  final AsyncValue<List<Person>> personsAsync;
+  final ValueChanged<String?> onPersonChanged;
+  final ValueChanged<int?> onMonthChanged;
+  final VoidCallback onPrevYear;
+  final VoidCallback onNextYear;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+      child: Column(
+        children: [
+          personsAsync.when(
+            loading: () => const LinearProgressIndicator(),
+            error: (e, _) => Text(e.toString()),
+            data: (persons) {
+              // Drop stale selection if person no longer exists.
+              final exists = personId == null ||
+                  persons.any((p) => p.id == personId);
+              if (!exists) {
+                WidgetsBinding.instance.addPostFrameCallback(
+                  (_) => onPersonChanged(null),
+                );
+              }
+              return DropdownMenu<String?>(
+                key: ValueKey(personId ?? ''),
+                initialSelection: exists ? personId : null,
+                enableFilter: true,
+                enableSearch: true,
+                requestFocusOnTap: true,
+                expandedInsets: EdgeInsets.zero,
+                label: Text(l.person),
+                menuHeight: 320,
+                dropdownMenuEntries: <DropdownMenuEntry<String?>>[
+                  DropdownMenuEntry<String?>(
+                      value: null, label: l.allPersons),
+                  ...persons.map((p) => DropdownMenuEntry<String?>(
+                        value: p.id,
+                        label: p.name,
+                      )),
+                ],
+                onSelected: onPersonChanged,
+              );
+            },
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<int?>(
+                  initialValue: month,
+                  decoration: InputDecoration(
+                    labelText: l.month,
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 12),
+                  ),
+                  items: <DropdownMenuItem<int?>>[
+                    DropdownMenuItem(value: null, child: Text(l.allMonths)),
+                    ...List.generate(
+                      12,
+                      (i) => DropdownMenuItem<int?>(
+                        value: i + 1,
+                        child: Text(
+                          Formatters.date(context, DateTime(year, i + 1),
+                              pattern: 'MMM'),
+                        ),
+                      ),
+                    ),
+                  ],
+                  onChanged: onMonthChanged,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: onPrevYear,
+              ),
+              Text(
+                Formatters.number(context, year),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: onNextYear,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
