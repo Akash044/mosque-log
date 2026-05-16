@@ -46,6 +46,8 @@
   "incomeEid": "Eid",
 
   "donorName": "Donor name",
+  "note": "Note",
+  "noteOptional": "Note (optional)",
   "amount": "Amount",
   "quantity": "Quantity",
   "date": "Date",

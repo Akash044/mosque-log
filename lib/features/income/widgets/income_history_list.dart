@@ -114,10 +114,14 @@ class IncomeTile extends ConsumerWidget {
     switch (income.type) {
       case IncomeType.general:
         final qty = income.quantity;
-        if (qty != null && qty > 0) {
-          return '$dateStr  ·  ${Formatters.number(context, qty)} ${l.qty}';
+        final note = income.note?.trim();
+        final head = (qty != null && qty > 0)
+            ? '$dateStr  ·  ${Formatters.number(context, qty)} ${l.qty}'
+            : dateStr;
+        if (note != null && note.isNotEmpty) {
+          return '$head\n$note';
         }
-        return dateStr;
+        return head;
       case IncomeType.jumma:
         return Formatters.date(context, income.date,
             pattern: 'EEEE, d MMM y');
@@ -137,7 +141,9 @@ class IncomeTile extends ConsumerWidget {
     final title = _title(context);
     final subtitle = _subtitle(context);
     final isThreeLine =
-        income.type == IncomeType.monthly && income.months.isNotEmpty;
+        (income.type == IncomeType.monthly && income.months.isNotEmpty) ||
+            (income.type == IncomeType.general &&
+                (income.note?.trim().isNotEmpty ?? false));
 
     return Dismissible(
       key: ValueKey(income.id),

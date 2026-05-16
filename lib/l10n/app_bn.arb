@@ -46,6 +46,8 @@
   "incomeEid": "ঈদ",
 
   "donorName": "দাতার নাম",
+  "note": "নোট",
+  "noteOptional": "নোট (ঐচ্ছিক)",
   "amount": "টাকার পরিমাণ",
   "quantity": "সংখ্যা",
   "date": "তারিখ",

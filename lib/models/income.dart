@@ -31,6 +31,7 @@ class Income {
   final String? personId;
   final List<String> months;
   final String? eidType;
+  final String? note;
   final String createdBy;
   final DateTime createdAt;
 
@@ -44,6 +45,7 @@ class Income {
     this.personId,
     this.months = const [],
     this.eidType,
+    this.note,
     required this.createdBy,
     required this.createdAt,
   });
@@ -62,6 +64,7 @@ class Income {
           .map((e) => e.toString())
           .toList(growable: false),
       eidType: d['eidType'] as String?,
+      note: d['note'] as String?,
       createdBy: (d['createdBy'] as String?) ?? '',
       createdAt:
           (d['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
@@ -78,6 +81,7 @@ class Income {
       'personId': personId,
       'months': months,
       'eidType': eidType,
+      'note': note,
       'createdBy': createdBy,
       'createdAt': Timestamp.fromDate(createdAt),
     };

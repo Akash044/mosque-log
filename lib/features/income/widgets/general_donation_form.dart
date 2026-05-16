@@ -21,6 +21,7 @@ class _GeneralDonationFormState extends ConsumerState<GeneralDonationForm> {
   final _donor = TextEditingController();
   final _amount = TextEditingController();
   final _quantity = TextEditingController();
+  final _note = TextEditingController();
   DateTime _date = DateTime.now();
   bool _saving = false;
 
@@ -29,6 +30,7 @@ class _GeneralDonationFormState extends ConsumerState<GeneralDonationForm> {
     _donor.dispose();
     _amount.dispose();
     _quantity.dispose();
+    _note.dispose();
     super.dispose();
   }
 
@@ -64,6 +66,7 @@ class _GeneralDonationFormState extends ConsumerState<GeneralDonationForm> {
       quantity: qty,
       donorName: _donor.text.trim().isEmpty ? null : _donor.text.trim(),
       date: _date,
+      note: _note.text.trim().isEmpty ? null : _note.text.trim(),
       createdBy: uid,
       createdAt: now,
     );
@@ -72,6 +75,7 @@ class _GeneralDonationFormState extends ConsumerState<GeneralDonationForm> {
     _donor.clear();
     _amount.clear();
     _quantity.clear();
+    _note.clear();
     setState(() {
       _date = DateTime.now();
       _saving = false;
@@ -119,6 +123,13 @@ class _GeneralDonationFormState extends ConsumerState<GeneralDonationForm> {
                       ),
                       child: Text(Formatters.date(context, _date)),
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _note,
+                    maxLines: 3,
+                    minLines: 1,
+                    decoration: InputDecoration(labelText: l.noteOptional),
                   ),
                   const SizedBox(height: 16),
                   FilledButton(
