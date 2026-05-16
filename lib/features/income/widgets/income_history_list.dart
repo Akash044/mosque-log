@@ -8,28 +8,11 @@ import '../../../models/person.dart';
 import '../../../providers/firestore_provider.dart';
 import '../../../providers/income_provider.dart';
 import '../../../providers/person_provider.dart';
+import 'income_csv_export.dart';
 
-/// Sticky heading shown above an [IncomeHistoryList] when it sits inside a
-/// fixed-form-on-top / scrollable-history-below layout.
-Widget historyHeading(BuildContext context, String text) {
-  return Container(
-    width: double.infinity,
-    decoration: BoxDecoration(
-      border: Border(
-        top: BorderSide(
-          color: Theme.of(context).dividerColor,
-          width: 1,
-        ),
-      ),
-    ),
-    padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-    child: Text(text, style: Theme.of(context).textTheme.titleMedium),
-  );
-}
-
-/// Shared "recent entries" list shown below each income form. Filters
-/// `incomeProvider` to a single [IncomeType] and renders one row per doc,
-/// with swipe-to-delete and a per-type subtitle.
+/// Shared "recent entries" list with a built-in heading + export button.
+/// Filters `incomeProvider` to a single [IncomeType] and renders one row per
+/// doc, with swipe-to-delete and a per-type subtitle.
 class IncomeHistoryList extends ConsumerWidget {
   const IncomeHistoryList({super.key, required this.type, this.maxItems = 50});
 
@@ -40,7 +23,6 @@ class IncomeHistoryList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final incomeAsync = ref.watch(incomeProvider);
-    // Persons map only needed for monthly rows.
     final needsPersons =
         type == IncomeType.monthly || type == IncomeType.ramadan;
     final personsAsync = needsPersons
@@ -48,37 +30,95 @@ class IncomeHistoryList extends ConsumerWidget {
         : const AsyncValue<List<Person>>.data([]);
 
     return incomeAsync.when(
-      loading: () =>
-          const Center(child: CircularProgressIndicator()),
-      error: (e, _) => Center(child: Text(e.toString())),
+      loading: () => Column(
+        children: [
+          historyHeading(context, l.history),
+          const Expanded(child: Center(child: CircularProgressIndicator())),
+        ],
+      ),
+      error: (e, _) => Column(
+        children: [
+          historyHeading(context, l.history),
+          Expanded(child: Center(child: Text(e.toString()))),
+        ],
+      ),
       data: (all) {
         final scoped = all.where((i) => i.type == type).toList()
           ..sort((a, b) => b.date.compareTo(a.date));
         final items = scoped.take(maxItems).toList();
-        if (items.isEmpty) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(l.noData),
-            ),
-          );
-        }
         final personsById = personsAsync.maybeWhen(
           data: (xs) => {for (final p in xs) p.id: p},
           orElse: () => <String, Person>{},
         );
-        return ListView.separated(
-          padding: const EdgeInsets.only(bottom: 16),
-          itemCount: items.length,
-          separatorBuilder: (_, __) => const Divider(height: 1),
-          itemBuilder: (_, i) => IncomeTile(
-            income: items[i],
-            personsById: personsById,
-          ),
+
+        return Column(
+          children: [
+            historyHeading(
+              context,
+              l.history,
+              onExport: items.isEmpty
+                  ? null
+                  : () => shareIncomeCsv(
+                        context,
+                        records: items,
+                        personsById: personsById,
+                        filenameStem: '${type.key}_history',
+                      ),
+            ),
+            Expanded(
+              child: items.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(l.noData),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      itemCount: items.length,
+                      separatorBuilder: (_, __) => const Divider(height: 1),
+                      itemBuilder: (_, i) => IncomeTile(
+                        income: items[i],
+                        personsById: personsById,
+                      ),
+                    ),
+            ),
+          ],
         );
       },
     );
   }
+}
+
+/// Top-bordered heading row used above a history list. Renders the title on
+/// the left and, when [onExport] is non-null, an export-CSV icon on the right.
+Widget historyHeading(
+  BuildContext context,
+  String text, {
+  VoidCallback? onExport,
+}) {
+  final l = AppLocalizations.of(context);
+  return Container(
+    width: double.infinity,
+    decoration: BoxDecoration(
+      border: Border(
+        top: BorderSide(color: Theme.of(context).dividerColor, width: 1),
+      ),
+    ),
+    padding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
+    child: Row(
+      children: [
+        Text(text, style: Theme.of(context).textTheme.titleMedium),
+        const Spacer(),
+        if (onExport != null)
+          IconButton(
+            icon: const Icon(Icons.ios_share),
+            tooltip: l.exportCsv,
+            onPressed: onExport,
+          ),
+      ],
+    ),
+  );
 }
 
 class IncomeTile extends ConsumerWidget {

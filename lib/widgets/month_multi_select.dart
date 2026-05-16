@@ -91,7 +91,7 @@ class _MonthMultiSelectState extends State<MonthMultiSelect> {
               onPressed: () => setState(() => _year -= 1),
             ),
             Text(
-              Formatters.number(context, _year),
+              Formatters.year(context, _year),
               style: Theme.of(context).textTheme.titleMedium,
             ),
             IconButton(

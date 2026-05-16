@@ -55,7 +55,7 @@ class _ExpensePageState extends ConsumerState<ExpensePage>
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
-                Formatters.number(context, _year),
+                Formatters.year(context, _year),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),

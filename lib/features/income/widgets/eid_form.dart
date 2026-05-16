@@ -135,7 +135,6 @@ class _EidFormState extends ConsumerState<EidForm> {
             ),
           ),
         ),
-        historyHeading(context, l.history),
         const Expanded(
           child: IncomeHistoryList(type: IncomeType.eid),
         ),

@@ -20,9 +20,33 @@ ThemeData _buildTheme(Brightness brightness) {
       elevation: 0,
       centerTitle: false,
     ),
-    inputDecorationTheme: const InputDecorationTheme(
-      border: OutlineInputBorder(),
+    inputDecorationTheme: InputDecorationTheme(
       filled: true,
+      fillColor: scheme.surfaceContainerHighest,
+      isDense: false,
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: scheme.primary, width: 1.6),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: scheme.error, width: 1.2),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: scheme.error, width: 1.6),
+      ),
+      floatingLabelBehavior: FloatingLabelBehavior.auto,
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(

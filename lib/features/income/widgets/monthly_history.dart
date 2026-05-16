@@ -7,6 +7,7 @@ import '../../../models/income.dart';
 import '../../../models/person.dart';
 import '../../../providers/income_provider.dart';
 import '../../../providers/person_provider.dart';
+import 'income_csv_export.dart';
 import 'income_history_list.dart';
 
 /// Monthly payments history with Person / Month filters and a year navigator
@@ -45,12 +46,32 @@ class _MonthlyHistoryState extends ConsumerState<MonthlyHistory> {
     final incomeAsync = ref.watch(incomeProvider);
     final personsAsync = ref.watch(personsProvider);
 
+    final filtered = incomeAsync.maybeWhen(
+      data: (all) => all
+          .where((i) => i.type == IncomeType.monthly && _matches(i))
+          .toList()
+        ..sort((a, b) => b.date.compareTo(a.date)),
+      orElse: () => const <Income>[],
+    );
+    final personsById = personsAsync.maybeWhen(
+      data: (xs) => {for (final p in xs) p.id: p},
+      orElse: () => <String, Person>{},
+    );
+
     return Column(
       children: [
         _HeadingWithYear(
           year: _year,
           onPrev: () => setState(() => _year -= 1),
           onNext: () => setState(() => _year += 1),
+          onExport: filtered.isEmpty
+              ? null
+              : () => shareIncomeCsv(
+                    context,
+                    records: filtered,
+                    personsById: personsById,
+                    filenameStem: 'monthly_payments',
+                  ),
         ),
         _FilterBar(
           personId: _personId,
@@ -66,13 +87,8 @@ class _MonthlyHistoryState extends ConsumerState<MonthlyHistory> {
             loading: () =>
                 const Center(child: CircularProgressIndicator()),
             error: (e, _) => Center(child: Text(e.toString())),
-            data: (all) {
-              final items = all
-                  .where((i) => i.type == IncomeType.monthly && _matches(i))
-                  .toList()
-                ..sort((a, b) => b.date.compareTo(a.date));
-
-              if (items.isEmpty) {
+            data: (_) {
+              if (filtered.isEmpty) {
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
@@ -80,16 +96,12 @@ class _MonthlyHistoryState extends ConsumerState<MonthlyHistory> {
                   ),
                 );
               }
-              final personsById = personsAsync.maybeWhen(
-                data: (xs) => {for (final p in xs) p.id: p},
-                orElse: () => <String, Person>{},
-              );
               return ListView.separated(
                 padding: const EdgeInsets.only(bottom: 16),
-                itemCount: items.length,
+                itemCount: filtered.length,
                 separatorBuilder: (_, __) => const Divider(height: 1),
                 itemBuilder: (_, i) => IncomeTile(
-                  income: items[i],
+                  income: filtered[i],
                   personsById: personsById,
                 ),
               );
@@ -106,11 +118,13 @@ class _HeadingWithYear extends StatelessWidget {
     required this.year,
     required this.onPrev,
     required this.onNext,
+    required this.onExport,
   });
 
   final int year;
   final VoidCallback onPrev;
   final VoidCallback onNext;
+  final VoidCallback? onExport;
 
   @override
   Widget build(BuildContext context) {
@@ -129,12 +143,18 @@ class _HeadingWithYear extends StatelessWidget {
           Text(l.history, style: Theme.of(context).textTheme.titleMedium),
           Row(
             children: [
+              if (onExport != null)
+                IconButton(
+                  icon: const Icon(Icons.ios_share),
+                  tooltip: l.exportCsv,
+                  onPressed: onExport,
+                ),
               IconButton(
                 icon: const Icon(Icons.chevron_left),
                 onPressed: onPrev,
               ),
               Text(
-                Formatters.number(context, year),
+                Formatters.year(context, year),
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               IconButton(
@@ -196,6 +216,8 @@ class _FilterBar extends StatelessWidget {
                   expandedInsets: EdgeInsets.zero,
                   label: Text(l.person),
                   menuHeight: 320,
+                  inputDecorationTheme:
+                      Theme.of(context).inputDecorationTheme,
                   dropdownMenuEntries: <DropdownMenuEntry<String?>>[
                     DropdownMenuEntry<String?>(
                         value: null, label: l.allPersons),

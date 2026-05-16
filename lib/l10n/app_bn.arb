@@ -113,6 +113,7 @@
   "toDate": "পর্যন্ত",
   "incomeBreakdown": "আয়ের বিবরণ",
   "exportCsv": "CSV হিসেবে রপ্তানি",
+  "exportEmpty": "এই সময়ে কিছু এক্সপোর্ট করার নেই",
   "noData": "এই সময়ের জন্য কোন তথ্য নেই",
 
   "amountRequired": "পরিমাণ আবশ্যক",

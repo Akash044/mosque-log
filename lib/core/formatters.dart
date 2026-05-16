@@ -23,6 +23,13 @@ class Formatters {
     return NumberFormat.decimalPattern(code).format(value);
   }
 
+  /// 4-digit year with locale-aware digits (Bangla numerals in `bn`) but
+  /// without any thousands separator. `2026` → "2026" / "২০২৬".
+  static String year(BuildContext context, int y) {
+    final code = Localizations.localeOf(context).languageCode;
+    return NumberFormat('0000', code).format(y);
+  }
+
   static String date(BuildContext context, DateTime date,
       {String pattern = 'd MMM y'}) {
     final code = Localizations.localeOf(context).languageCode;

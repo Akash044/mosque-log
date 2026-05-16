@@ -112,6 +112,8 @@ class _RamadanFormState extends ConsumerState<RamadanForm> {
                             expandedInsets: EdgeInsets.zero,
                             label: Text(l.person),
                             menuHeight: 320,
+                            inputDecorationTheme:
+                                Theme.of(context).inputDecorationTheme,
                             dropdownMenuEntries: persons
                                 .map((p) => DropdownMenuEntry<Person>(
                                       value: p,
@@ -179,7 +181,6 @@ class _RamadanFormState extends ConsumerState<RamadanForm> {
             ),
           ),
         ),
-        historyHeading(context, l.history),
         const Expanded(
           child: IncomeHistoryList(type: IncomeType.ramadan),
         ),

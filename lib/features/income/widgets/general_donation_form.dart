@@ -146,7 +146,6 @@ class _GeneralDonationFormState extends ConsumerState<GeneralDonationForm> {
             ),
           ),
         ),
-        historyHeading(context, l.history),
         const Expanded(
           child: IncomeHistoryList(type: IncomeType.general),
         ),

@@ -1,11 +1,19 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../core/formatters.dart';
 import '../../l10n/app_localizations.dart';
+import '../../models/expense.dart';
 import '../../models/income.dart';
+import '../../models/person.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/income_provider.dart';
+import '../../providers/person_provider.dart';
 import '../../widgets/settings_action.dart';
 
 class ReportPage extends ConsumerStatefulWidget {
@@ -39,6 +47,114 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     if (picked != null) setState(() => _range = picked);
   }
 
+  Future<void> _export(
+    BuildContext context,
+    AsyncValue<List<Income>> incomeAsync,
+    AsyncValue<List<Expense>> expenseAsync, {
+    required DateTime endExclusive,
+  }) async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+
+    final incomes = (incomeAsync.value ?? const <Income>[])
+        .where((i) =>
+            !i.date.isBefore(_range.start) && i.date.isBefore(endExclusive))
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    final expenses = (expenseAsync.value ?? const <Expense>[])
+        .where((e) =>
+            !e.date.isBefore(_range.start) && e.date.isBefore(endExclusive))
+        .toList()
+      ..sort((a, b) => a.date.compareTo(b.date));
+
+    if (incomes.isEmpty && expenses.isEmpty) {
+      messenger.showSnackBar(SnackBar(content: Text(l.exportEmpty)));
+      return;
+    }
+
+    final personsById = (ref.read(personsProvider).value ?? const <Person>[])
+        .fold<Map<String, Person>>({}, (acc, p) {
+      acc[p.id] = p;
+      return acc;
+    });
+
+    final fromStr = DateFormat('yyyy-MM-dd').format(_range.start);
+    final toStr = DateFormat('yyyy-MM-dd').format(_range.end);
+
+    final files = <XFile>[];
+    if (incomes.isNotEmpty) {
+      files.add(_csvFile(
+        'income_${fromStr}_$toStr.csv',
+        _buildIncomeCsv(incomes, personsById),
+      ));
+    }
+    if (expenses.isNotEmpty) {
+      files.add(_csvFile(
+        'expense_${fromStr}_$toStr.csv',
+        _buildExpenseCsv(expenses),
+      ));
+    }
+
+    await Share.shareXFiles(
+      files,
+      subject: 'Mosque Log report $fromStr — $toStr',
+    );
+  }
+
+  XFile _csvFile(String name, String content) {
+    return XFile.fromData(
+      Uint8List.fromList(utf8.encode(content)),
+      name: name,
+      mimeType: 'text/csv',
+    );
+  }
+
+  String _buildIncomeCsv(
+    List<Income> rows,
+    Map<String, Person> personsById,
+  ) {
+    final df = DateFormat('yyyy-MM-dd');
+    final buf = StringBuffer();
+    buf.writeln(
+        'type,date,amount,donor_name,quantity,person,months,eid_type,note');
+    for (final i in rows) {
+      buf.writeln([
+        i.type.key,
+        df.format(i.date),
+        i.amount,
+        _csv(i.donorName),
+        i.quantity ?? '',
+        _csv(personsById[i.personId]?.name),
+        _csv(i.months.join('|')),
+        _csv(i.eidType),
+        _csv(i.note),
+      ].join(','));
+    }
+    return buf.toString();
+  }
+
+  String _buildExpenseCsv(List<Expense> rows) {
+    final df = DateFormat('yyyy-MM-dd');
+    final buf = StringBuffer();
+    buf.writeln('date,type,amount');
+    for (final e in rows) {
+      buf.writeln([
+        df.format(e.date),
+        _csv(e.expenseType),
+        e.amount,
+      ].join(','));
+    }
+    return buf.toString();
+  }
+
+  String _csv(String? v) {
+    if (v == null || v.isEmpty) return '';
+    final needsQuotes = v.contains(',') || v.contains('"') || v.contains('\n');
+    final escaped = v.replaceAll('"', '""');
+    return needsQuotes ? '"$escaped"' : escaped;
+  }
+
   String _incomeTypeLabel(BuildContext context, IncomeType t) {
     final l = AppLocalizations.of(context);
     switch (t) {
@@ -69,7 +185,15 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(l.reportTitle),
-        actions: const [SettingsAction()],
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.ios_share),
+            tooltip: l.exportCsv,
+            onPressed: () => _export(context, incomeAsync, expenseAsync,
+                endExclusive: endExclusive),
+          ),
+          const SettingsAction(),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),

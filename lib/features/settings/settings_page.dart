@@ -16,75 +16,85 @@ class SettingsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text(l.navSettings)),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          Card(
-            child: Padding(
+          Expanded(
+            child: ListView(
               padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l.settingsLanguage,
-                      style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 12),
-                  SegmentedButton<String>(
-                    segments: [
-                      ButtonSegment(
-                          value: 'bn', label: Text(l.languageBangla)),
-                      ButtonSegment(
-                          value: 'en', label: Text(l.languageEnglish)),
-                    ],
-                    selected: {settings.locale.languageCode},
-                    onSelectionChanged: (s) =>
-                        controller.setLocale(Locale(s.first)),
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(l.settingsLanguage,
+                            style: Theme.of(context).textTheme.titleMedium),
+                        const SizedBox(height: 12),
+                        SegmentedButton<String>(
+                          segments: [
+                            ButtonSegment(
+                                value: 'bn', label: Text(l.languageBangla)),
+                            ButtonSegment(
+                                value: 'en', label: Text(l.languageEnglish)),
+                          ],
+                          selected: {settings.locale.languageCode},
+                          onSelectionChanged: (s) =>
+                              controller.setLocale(Locale(s.first)),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 12),
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(l.settingsTheme,
+                            style: Theme.of(context).textTheme.titleMedium),
+                        const SizedBox(height: 12),
+                        SegmentedButton<ThemeMode>(
+                          segments: [
+                            ButtonSegment(
+                                value: ThemeMode.system,
+                                label: Text(l.themeSystem),
+                                icon: const Icon(Icons.brightness_auto)),
+                            ButtonSegment(
+                                value: ThemeMode.light,
+                                label: Text(l.themeLight),
+                                icon: const Icon(Icons.light_mode)),
+                            ButtonSegment(
+                                value: ThemeMode.dark,
+                                label: Text(l.themeDark),
+                                icon: const Icon(Icons.dark_mode)),
+                          ],
+                          selected: {settings.themeMode},
+                          onSelectionChanged: (s) =>
+                              controller.setThemeMode(s.first),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                FilledButton.tonalIcon(
+                  onPressed: () => ref.read(authServiceProvider).signOut(),
+                  icon: const Icon(Icons.logout),
+                  label: Text(l.signOut),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 12),
-          Card(
+          SafeArea(
+            top: false,
             child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l.settingsTheme,
-                      style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 12),
-                  SegmentedButton<ThemeMode>(
-                    segments: [
-                      ButtonSegment(
-                          value: ThemeMode.system,
-                          label: Text(l.themeSystem),
-                          icon: const Icon(Icons.brightness_auto)),
-                      ButtonSegment(
-                          value: ThemeMode.light,
-                          label: Text(l.themeLight),
-                          icon: const Icon(Icons.light_mode)),
-                      ButtonSegment(
-                          value: ThemeMode.dark,
-                          label: Text(l.themeDark),
-                          icon: const Icon(Icons.dark_mode)),
-                    ],
-                    selected: {settings.themeMode},
-                    onSelectionChanged: (s) =>
-                        controller.setThemeMode(s.first),
-                  ),
-                ],
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              child: const _DeveloperCredit(),
             ),
           ),
-          const SizedBox(height: 24),
-          FilledButton.tonalIcon(
-            onPressed: () => ref.read(authServiceProvider).signOut(),
-            icon: const Icon(Icons.logout),
-            label: Text(l.signOut),
-          ),
-          const SizedBox(height: 32),
-          const _DeveloperCredit(),
-          const SizedBox(height: 16),
         ],
       ),
     );

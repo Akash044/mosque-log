@@ -113,6 +113,7 @@
   "toDate": "To",
   "incomeBreakdown": "Income breakdown",
   "exportCsv": "Export CSV",
+  "exportEmpty": "Nothing to export in this range",
   "noData": "No data for this period",
 
   "amountRequired": "Amount is required",

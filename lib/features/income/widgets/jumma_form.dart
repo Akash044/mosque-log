@@ -131,7 +131,6 @@ class _JummaFormState extends ConsumerState<JummaForm> {
             ),
           ),
         ),
-        historyHeading(context, l.history),
         const Expanded(
           child: IncomeHistoryList(type: IncomeType.jumma),
         ),
