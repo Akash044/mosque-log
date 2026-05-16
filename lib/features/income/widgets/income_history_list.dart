@@ -157,15 +157,15 @@ class IncomeTile extends ConsumerWidget {
       confirmDismiss: (_) async {
         return await showDialog<bool>(
               context: context,
-              builder: (_) => AlertDialog(
+              builder: (dialogCtx) => AlertDialog(
                 content: Text(l.deleteConfirm),
                 actions: [
                   TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
+                    onPressed: () => Navigator.of(dialogCtx).pop(false),
                     child: Text(l.no),
                   ),
                   FilledButton(
-                    onPressed: () => Navigator.of(context).pop(true),
+                    onPressed: () => Navigator.of(dialogCtx).pop(true),
                     child: Text(l.yes),
                   ),
                 ],
