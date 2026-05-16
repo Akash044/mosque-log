@@ -6,7 +6,9 @@ import '../../l10n/app_localizations.dart';
 import '../../models/income.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/income_provider.dart';
+import '../../widgets/language_action.dart';
 import '../../widgets/settings_action.dart';
+import '../../widgets/theme_action.dart';
 import 'widgets/summary_card.dart';
 
 class DashboardPage extends ConsumerWidget {
@@ -21,7 +23,11 @@ class DashboardPage extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(l.navDashboard),
-        actions: const [SettingsAction()],
+        actions: const [
+          LanguageAction(),
+          ThemeAction(),
+          SettingsAction(),
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -59,6 +65,8 @@ class DashboardPage extends ConsumerWidget {
               return ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
+                  const _MosqueHeader(),
+                  const SizedBox(height: 16),
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
@@ -125,6 +133,39 @@ class DashboardPage extends ConsumerWidget {
         Text(message,
             textAlign: TextAlign.center,
             style: const TextStyle(color: Colors.red)),
+      ],
+    );
+  }
+}
+
+class _MosqueHeader extends StatelessWidget {
+  const _MosqueHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Icon(Icons.mosque, size: 36, color: scheme.primary),
+        const SizedBox(height: 6),
+        Text(
+          l.mosqueName,
+          textAlign: TextAlign.center,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          l.mosqueAddress,
+          textAlign: TextAlign.center,
+          style: Theme.of(context)
+              .textTheme
+              .bodyMedium
+              ?.copyWith(color: scheme.onSurfaceVariant),
+        ),
       ],
     );
   }

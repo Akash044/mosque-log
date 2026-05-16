@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/person.dart';
@@ -54,6 +55,17 @@ class _PersonTile extends ConsumerWidget {
   const _PersonTile({required this.person});
   final Person person;
 
+  Future<void> _call(BuildContext context, String phone) async {
+    final digits = phone.replaceAll(RegExp(r'[^0-9+]'), '');
+    final uri = Uri(scheme: 'tel', path: digits);
+    final ok = await launchUrl(uri);
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open dialer for $phone')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
@@ -99,9 +111,21 @@ class _PersonTile extends ConsumerWidget {
         subtitle: person.phone == null || person.phone!.isEmpty
             ? null
             : Text(person.phone!),
-        trailing: Switch(
-          value: person.active,
-          onChanged: (v) => service.setPersonActive(person.id, v),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (person.phone != null && person.phone!.trim().isNotEmpty)
+              IconButton(
+                icon: const Icon(Icons.call),
+                tooltip: person.phone,
+                color: Theme.of(context).colorScheme.primary,
+                onPressed: () => _call(context, person.phone!),
+              ),
+            Switch(
+              value: person.active,
+              onChanged: (v) => service.setPersonActive(person.id, v),
+            ),
+          ],
         ),
       ),
     );

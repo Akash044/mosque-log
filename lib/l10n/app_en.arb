@@ -4,6 +4,8 @@
   "appTitle": "Mosque Finance Tracker",
 
   "navDashboard": "Dashboard",
+  "mosqueName": "Baitur Nur Jame Mosjid",
+  "mosqueAddress": "Khushi Para, Patuakandi, Bheramara, Kushtia",
   "navIncome": "Income",
   "navExpense": "Expense",
   "navReport": "Report",
@@ -34,7 +36,7 @@
 
   "totalIncome": "Total income",
   "totalExpense": "Total expense",
-  "currentWeekIncome": "This week",
+  "currentWeekIncome": "This week Income",
   "jummaIncome": "Jumma income",
   "netBalance": "Net balance",
 
@@ -71,6 +73,8 @@
   "active": "Active",
   "inactive": "Inactive",
   "selectMonths": "Select months",
+  "selectAll": "Select all",
+  "deselectAll": "Deselect all",
   "noMonthsSelected": "Pick at least one month",
   "noPersons": "No persons added yet",
   "noDuePersons": "Everyone has paid for this month",

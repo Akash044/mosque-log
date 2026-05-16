@@ -4,6 +4,8 @@
   "appTitle": "মসজিদ অর্থ ব্যবস্থাপনা",
 
   "navDashboard": "ড্যাশবোর্ড",
+  "mosqueName": "বাইতুর নুর জামে মসজিদ",
+  "mosqueAddress": "খুশি পাড়া, পাটুয়াকান্দি, ভেড়ামারা, কুষ্টিয়া",
   "navIncome": "আয়",
   "navExpense": "ব্যয়",
   "navReport": "প্রতিবেদন",
@@ -71,6 +73,8 @@
   "active": "সক্রিয়",
   "inactive": "নিষ্ক্রিয়",
   "selectMonths": "মাস নির্বাচন",
+  "selectAll": "সব বাছাই",
+  "deselectAll": "সব বাতিল",
   "noMonthsSelected": "অন্তত একটি মাস বেছে নিন",
   "noPersons": "এখনও কোন ব্যক্তি যোগ হয়নি",
   "noDuePersons": "এই মাসে সকলেই পরিশোধ করেছেন",

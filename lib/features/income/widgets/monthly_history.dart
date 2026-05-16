@@ -9,7 +9,8 @@ import '../../../providers/income_provider.dart';
 import '../../../providers/person_provider.dart';
 import 'income_history_list.dart';
 
-/// Monthly payments history with Person / Month / Year filters.
+/// Monthly payments history with Person / Month filters and a year navigator
+/// inline with the "History" heading.
 class MonthlyHistory extends ConsumerStatefulWidget {
   const MonthlyHistory({super.key});
 
@@ -46,6 +47,11 @@ class _MonthlyHistoryState extends ConsumerState<MonthlyHistory> {
 
     return Column(
       children: [
+        _HeadingWithYear(
+          year: _year,
+          onPrev: () => setState(() => _year -= 1),
+          onNext: () => setState(() => _year += 1),
+        ),
         _FilterBar(
           personId: _personId,
           month: _month,
@@ -53,8 +59,6 @@ class _MonthlyHistoryState extends ConsumerState<MonthlyHistory> {
           personsAsync: personsAsync,
           onPersonChanged: (id) => setState(() => _personId = id),
           onMonthChanged: (m) => setState(() => _month = m),
-          onPrevYear: () => setState(() => _year -= 1),
-          onNextYear: () => setState(() => _year += 1),
         ),
         const Divider(height: 1),
         Expanded(
@@ -97,6 +101,54 @@ class _MonthlyHistoryState extends ConsumerState<MonthlyHistory> {
   }
 }
 
+class _HeadingWithYear extends StatelessWidget {
+  const _HeadingWithYear({
+    required this.year,
+    required this.onPrev,
+    required this.onNext,
+  });
+
+  final int year;
+  final VoidCallback onPrev;
+  final VoidCallback onNext;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: Theme.of(context).dividerColor, width: 1),
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(l.history, style: Theme.of(context).textTheme.titleMedium),
+          Row(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: onPrev,
+              ),
+              Text(
+                Formatters.number(context, year),
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: onNext,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _FilterBar extends StatelessWidget {
   const _FilterBar({
     required this.personId,
@@ -105,8 +157,6 @@ class _FilterBar extends StatelessWidget {
     required this.personsAsync,
     required this.onPersonChanged,
     required this.onMonthChanged,
-    required this.onPrevYear,
-    required this.onNextYear,
   });
 
   final String? personId;
@@ -115,91 +165,75 @@ class _FilterBar extends StatelessWidget {
   final AsyncValue<List<Person>> personsAsync;
   final ValueChanged<String?> onPersonChanged;
   final ValueChanged<int?> onMonthChanged;
-  final VoidCallback onPrevYear;
-  final VoidCallback onNextYear;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
-      child: Column(
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          personsAsync.when(
-            loading: () => const LinearProgressIndicator(),
-            error: (e, _) => Text(e.toString()),
-            data: (persons) {
-              // Drop stale selection if person no longer exists.
-              final exists = personId == null ||
-                  persons.any((p) => p.id == personId);
-              if (!exists) {
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => onPersonChanged(null),
-                );
-              }
-              return DropdownMenu<String?>(
-                key: ValueKey(personId ?? ''),
-                initialSelection: exists ? personId : null,
-                enableFilter: true,
-                enableSearch: true,
-                requestFocusOnTap: true,
-                expandedInsets: EdgeInsets.zero,
-                label: Text(l.person),
-                menuHeight: 320,
-                dropdownMenuEntries: <DropdownMenuEntry<String?>>[
-                  DropdownMenuEntry<String?>(
-                      value: null, label: l.allPersons),
-                  ...persons.map((p) => DropdownMenuEntry<String?>(
-                        value: p.id,
-                        label: p.name,
-                      )),
-                ],
-                onSelected: onPersonChanged,
-              );
-            },
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Expanded(
-                child: DropdownButtonFormField<int?>(
-                  initialValue: month,
-                  decoration: InputDecoration(
-                    labelText: l.month,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 12),
-                  ),
-                  items: <DropdownMenuItem<int?>>[
-                    DropdownMenuItem(value: null, child: Text(l.allMonths)),
-                    ...List.generate(
-                      12,
-                      (i) => DropdownMenuItem<int?>(
-                        value: i + 1,
-                        child: Text(
-                          Formatters.date(context, DateTime(year, i + 1),
-                              pattern: 'MMM'),
-                        ),
-                      ),
-                    ),
+          Expanded(
+            child: personsAsync.when(
+              loading: () => const LinearProgressIndicator(),
+              error: (e, _) => Text(e.toString()),
+              data: (persons) {
+                final exists = personId == null ||
+                    persons.any((p) => p.id == personId);
+                if (!exists) {
+                  WidgetsBinding.instance.addPostFrameCallback(
+                    (_) => onPersonChanged(null),
+                  );
+                }
+                return DropdownMenu<String?>(
+                  key: ValueKey(personId ?? ''),
+                  initialSelection: exists ? personId : null,
+                  enableFilter: true,
+                  enableSearch: true,
+                  requestFocusOnTap: true,
+                  expandedInsets: EdgeInsets.zero,
+                  label: Text(l.person),
+                  menuHeight: 320,
+                  dropdownMenuEntries: <DropdownMenuEntry<String?>>[
+                    DropdownMenuEntry<String?>(
+                        value: null, label: l.allPersons),
+                    ...persons.map((p) => DropdownMenuEntry<String?>(
+                          value: p.id,
+                          label: p.name,
+                        )),
                   ],
-                  onChanged: onMonthChanged,
+                  onSelected: onPersonChanged,
+                );
+              },
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: DropdownButtonFormField<int?>(
+              initialValue: month,
+              decoration: InputDecoration(
+                labelText: l.month,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12, vertical: 12),
+              ),
+              items: <DropdownMenuItem<int?>>[
+                DropdownMenuItem(value: null, child: Text(l.allMonths)),
+                ...List.generate(
+                  12,
+                  (i) => DropdownMenuItem<int?>(
+                    value: i + 1,
+                    child: Text(
+                      Formatters.date(context, DateTime(year, i + 1),
+                          pattern: 'MMM'),
+                    ),
+                  ),
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.chevron_left),
-                onPressed: onPrevYear,
-              ),
-              Text(
-                Formatters.number(context, year),
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              IconButton(
-                icon: const Icon(Icons.chevron_right),
-                onPressed: onNextYear,
-              ),
-            ],
+              ],
+              onChanged: onMonthChanged,
+            ),
           ),
         ],
       ),

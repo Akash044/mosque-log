@@ -152,33 +152,45 @@ class _MonthlyCollectionFormState
                     onChanged: (v) => setState(() => _months = v),
                   ),
                   const SizedBox(height: 12),
-                  TextFormField(
-                    controller: _amount,
-                    keyboardType: TextInputType.number,
-                    decoration: InputDecoration(labelText: l.amount),
-                    validator: (v) {
-                      if ((v ?? '').trim().isEmpty) return l.amountRequired;
-                      final n = double.tryParse(v!.trim());
-                      if (n == null || n <= 0) return l.amountInvalid;
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  FilledButton(
-                    onPressed: _saving ? null : _save,
-                    child: _saving
-                        ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : Text(l.save),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _amount,
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(labelText: l.amount),
+                          validator: (v) {
+                            if ((v ?? '').trim().isEmpty) {
+                              return l.amountRequired;
+                            }
+                            final n = double.tryParse(v!.trim());
+                            if (n == null || n <= 0) return l.amountInvalid;
+                            return null;
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SizedBox(
+                        height: 56,
+                        width: 140,
+                        child: FilledButton(
+                          onPressed: _saving ? null : _save,
+                          child: _saving
+                              ? const SizedBox(
+                                  height: 18,
+                                  width: 18,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2),
+                                )
+                              : Text(l.save),
+                        ),
+                      ),
+                    ],
                   ),
               ],
             ),
           ),
         ),
-        historyHeading(context, l.history),
         const Expanded(
           child: MonthlyHistory(),
         ),

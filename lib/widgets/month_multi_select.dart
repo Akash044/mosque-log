@@ -36,11 +36,13 @@ class _MonthMultiSelectState extends State<MonthMultiSelect> {
     final l = AppLocalizations.of(context);
     final selected = widget.selected;
 
+    final visibleKeys = <String>{};
     final chips = <Widget>[];
     for (var i = 0; i < 12; i++) {
       final month = DateTime(_year, i + 1);
       final key = Formatters.monthKey(month);
       if (widget.paidMonths.contains(key)) continue;
+      visibleKeys.add(key);
       final on = selected.contains(key);
       chips.add(FilterChip(
         label: Text(Formatters.date(context, month, pattern: 'MMM')),
@@ -57,6 +59,19 @@ class _MonthMultiSelectState extends State<MonthMultiSelect> {
       ));
     }
 
+    final allSelected = visibleKeys.isNotEmpty &&
+        visibleKeys.every(selected.contains);
+
+    void toggleAll() {
+      final next = Set<String>.from(selected);
+      if (allSelected) {
+        next.removeAll(visibleKeys);
+      } else {
+        next.addAll(visibleKeys);
+      }
+      widget.onChanged(next);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -65,6 +80,12 @@ class _MonthMultiSelectState extends State<MonthMultiSelect> {
             Text(l.selectMonths,
                 style: Theme.of(context).textTheme.titleSmall),
             const Spacer(),
+            if (visibleKeys.isNotEmpty)
+              IconButton(
+                icon: Icon(allSelected ? Icons.deselect : Icons.select_all),
+                tooltip: allSelected ? l.deselectAll : l.selectAll,
+                onPressed: toggleAll,
+              ),
             IconButton(
               icon: const Icon(Icons.chevron_left),
               onPressed: () => setState(() => _year -= 1),
