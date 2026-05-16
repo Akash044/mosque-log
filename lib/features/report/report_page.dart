@@ -50,6 +50,8 @@ class _ReportPageState extends ConsumerState<ReportPage> {
         return l.incomeMonthly;
       case IncomeType.eid:
         return l.incomeEid;
+      case IncomeType.ramadan:
+        return l.incomeRamadan;
     }
   }
 

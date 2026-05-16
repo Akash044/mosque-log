@@ -41,7 +41,9 @@ class IncomeHistoryList extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final incomeAsync = ref.watch(incomeProvider);
     // Persons map only needed for monthly rows.
-    final personsAsync = type == IncomeType.monthly
+    final needsPersons =
+        type == IncomeType.monthly || type == IncomeType.ramadan;
+    final personsAsync = needsPersons
         ? ref.watch(personsProvider)
         : const AsyncValue<List<Person>>.data([]);
 
@@ -98,6 +100,8 @@ class IncomeTile extends ConsumerWidget {
         return personsById[income.personId]?.name ?? l.unknown;
       case IncomeType.eid:
         return _eidLabel(context, income.eidType);
+      case IncomeType.ramadan:
+        return personsById[income.personId]?.name ?? l.unknown;
     }
   }
 
@@ -132,6 +136,12 @@ class IncomeTile extends ConsumerWidget {
         return '$months\n$dateStr';
       case IncomeType.eid:
         return dateStr;
+      case IncomeType.ramadan:
+        final note = income.note?.trim();
+        if (note != null && note.isNotEmpty) {
+          return '$dateStr\n$note';
+        }
+        return dateStr;
     }
   }
 
@@ -140,10 +150,11 @@ class IncomeTile extends ConsumerWidget {
     final l = AppLocalizations.of(context);
     final title = _title(context);
     final subtitle = _subtitle(context);
+    final hasNote = income.note?.trim().isNotEmpty ?? false;
     final isThreeLine =
         (income.type == IncomeType.monthly && income.months.isNotEmpty) ||
-            (income.type == IncomeType.general &&
-                (income.note?.trim().isNotEmpty ?? false));
+            (income.type == IncomeType.general && hasNote) ||
+            (income.type == IncomeType.ramadan && hasNote);
 
     return Dismissible(
       key: ValueKey(income.id),

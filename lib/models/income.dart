@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-enum IncomeType { general, jumma, monthly, eid }
+enum IncomeType { general, jumma, monthly, eid, ramadan }
 
 extension IncomeTypeX on IncomeType {
   String get key => name;
@@ -15,6 +15,8 @@ extension IncomeTypeX on IncomeType {
         return IncomeType.monthly;
       case 'eid':
         return IncomeType.eid;
+      case 'ramadan':
+        return IncomeType.ramadan;
       default:
         return IncomeType.general;
     }

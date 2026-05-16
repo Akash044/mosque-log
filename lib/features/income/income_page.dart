@@ -8,6 +8,7 @@ import 'widgets/eid_form.dart';
 import 'widgets/general_donation_form.dart';
 import 'widgets/jumma_form.dart';
 import 'widgets/monthly_collection_form.dart';
+import 'widgets/ramadan_form.dart';
 
 class IncomePage extends StatefulWidget {
   const IncomePage({super.key});
@@ -23,7 +24,7 @@ class _IncomePageState extends State<IncomePage>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 4, vsync: this);
+    _tab = TabController(length: 5, vsync: this);
     _tab.addListener(() => setState(() {}));
   }
 
@@ -37,11 +38,12 @@ class _IncomePageState extends State<IncomePage>
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final isMonthly = _tab.index == 2;
+    final isPersonTab = _tab.index == 2 || _tab.index == 4;
     return Scaffold(
       appBar: AppBar(
         title: Text(l.navIncome),
         actions: [
-          if (isMonthly)
+          if (isPersonTab)
             IconButton(
               icon: const Icon(Icons.people_alt_outlined),
               tooltip: l.managePeople,
@@ -68,6 +70,7 @@ class _IncomePageState extends State<IncomePage>
             Tab(text: l.incomeJumma),
             Tab(text: l.incomeMonthly),
             Tab(text: l.incomeEid),
+            Tab(text: l.incomeRamadan),
           ],
         ),
       ),
@@ -78,6 +81,7 @@ class _IncomePageState extends State<IncomePage>
           JummaForm(),
           MonthlyCollectionForm(),
           EidForm(),
+          RamadanForm(),
         ],
       ),
     );
