@@ -82,8 +82,41 @@ class SettingsPage extends ConsumerWidget {
             icon: const Icon(Icons.logout),
             label: Text(l.signOut),
           ),
+          const SizedBox(height: 32),
+          const _DeveloperCredit(),
+          const SizedBox(height: 16),
         ],
       ),
+    );
+  }
+}
+
+class _DeveloperCredit extends StatelessWidget {
+  const _DeveloperCredit();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final muted = Theme.of(context)
+        .textTheme
+        .bodySmall
+        ?.copyWith(color: scheme.onSurfaceVariant);
+    return Column(
+      children: [
+        Text(l.developedBy, style: muted),
+        const SizedBox(height: 2),
+        Text(
+          l.developerName,
+          style: Theme.of(context)
+              .textTheme
+              .titleSmall
+              ?.copyWith(fontWeight: FontWeight.w600),
+        ),
+        Text(l.developerRole, style: muted, textAlign: TextAlign.center),
+        Text(l.developerCredentials,
+            style: muted, textAlign: TextAlign.center),
+      ],
     );
   }
 }

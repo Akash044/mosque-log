@@ -1,7 +1,7 @@
 {
   "@@locale": "en",
 
-  "appTitle": "Mosque Finance Tracker",
+  "appTitle": "Mosque Log",
 
   "navDashboard": "Dashboard",
   "mosqueName": "Baitur Nur Jame Mosjid",
@@ -20,6 +20,10 @@
   "haveAccount": "Already have an account? Sign in",
   "noAccount": "Don't have an account? Create one",
   "signOut": "Sign out",
+  "developedBy": "Developed by",
+  "developerName": "Md. Akash Hossain",
+  "developerRole": "Software Engineer, Nerddevs",
+  "developerCredentials": "BSc in CSE, RUET",
   "emailRequired": "Email is required",
   "emailInvalid": "Enter a valid email",
   "passwordRequired": "Password is required",

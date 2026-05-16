@@ -1,7 +1,7 @@
 {
   "@@locale": "bn",
 
-  "appTitle": "মসজিদ অর্থ ব্যবস্থাপনা",
+  "appTitle": "মসজিদ লগ",
 
   "navDashboard": "ড্যাশবোর্ড",
   "mosqueName": "বাইতুর নুর জামে মসজিদ",
@@ -20,6 +20,10 @@
   "haveAccount": "ইতিমধ্যে অ্যাকাউন্ট আছে? সাইন ইন করুন",
   "noAccount": "অ্যাকাউন্ট নেই? নতুন তৈরি করুন",
   "signOut": "সাইন আউট",
+  "developedBy": "ডেভেলপ করেছেন",
+  "developerName": "Md. Akash Hossain",
+  "developerRole": "Software Engineer, Nerddevs",
+  "developerCredentials": "BSc in CSE, RUET",
   "emailRequired": "ইমেইল আবশ্যক",
   "emailInvalid": "সঠিক ইমেইল দিন",
   "passwordRequired": "পাসওয়ার্ড আবশ্যক",
