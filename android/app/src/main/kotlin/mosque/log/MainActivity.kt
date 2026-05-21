@@ -1,4 +1,4 @@
-package com.example.mosque_expense_tracker
+package mosque.log
 
 import io.flutter.embedding.android.FlutterActivity
 

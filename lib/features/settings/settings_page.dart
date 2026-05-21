@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../l10n/app_localizations.dart';
+import '../../models/audit_log.dart';
+import '../../providers/audit_log_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/settings_provider.dart';
 
@@ -79,6 +82,8 @@ class SettingsPage extends ConsumerWidget {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12),
+                const _AuditLogSection(),
                 const SizedBox(height: 24),
                 FilledButton.tonalIcon(
                   onPressed: () => ref.read(authServiceProvider).signOut(),
@@ -97,6 +102,106 @@ class SettingsPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _AuditLogSection extends ConsumerWidget {
+  const _AuditLogSection();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final logsAsync = ref.watch(auditLogsProvider);
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        leading: const Icon(Icons.history),
+        title: Text(
+          l.auditLogTitle,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        childrenPadding: const EdgeInsets.only(bottom: 8),
+        children: [
+          logsAsync.when(
+            loading: () => const Padding(
+              padding: EdgeInsets.all(24),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+            error: (e, _) => Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(e.toString()),
+            ),
+            data: (logs) {
+              if (logs.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Center(child: Text(l.auditLogEmpty)),
+                );
+              }
+              return ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 360),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: logs.length,
+                  separatorBuilder: (_, __) => const Divider(height: 1),
+                  itemBuilder: (_, i) => _AuditTile(log: logs[i]),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AuditTile extends StatelessWidget {
+  const _AuditTile({required this.log});
+  final AuditLog log;
+
+  IconData _icon() {
+    switch (log.action) {
+      case 'create':
+        return Icons.add_circle_outline;
+      case 'update':
+        return Icons.edit_outlined;
+      case 'delete':
+        return Icons.delete_outline;
+      default:
+        return Icons.info_outline;
+    }
+  }
+
+  Color _color(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    switch (log.action) {
+      case 'create':
+        return scheme.primary;
+      case 'update':
+        return scheme.tertiary;
+      case 'delete':
+        return scheme.error;
+      default:
+        return scheme.onSurfaceVariant;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final when = DateFormat('d MMM y, h:mm a').format(log.timestamp);
+    final who = log.userEmail.isEmpty ? log.userId : log.userEmail;
+    return ListTile(
+      dense: true,
+      leading: Icon(_icon(), color: _color(context)),
+      title: Text(log.summary),
+      subtitle: Text(
+        '$who  ·  $when',
+        style: TextStyle(color: scheme.onSurfaceVariant),
+      ),
+      isThreeLine: false,
     );
   }
 }

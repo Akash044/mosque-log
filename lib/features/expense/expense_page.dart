@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/audit.dart';
 import '../../core/formatters.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/expense.dart';
@@ -192,10 +193,18 @@ class _ExpenseList extends ConsumerWidget {
                       ) ??
                       false;
                 },
-                onDismissed: (_) {
-                  ref
+                onDismissed: (_) async {
+                  await ref
                       .read(firestoreServiceProvider)
                       .deleteExpense(e.id);
+                  await logAudit(
+                    ref,
+                    action: 'delete',
+                    entityType: 'expense',
+                    entityId: e.id,
+                    summary:
+                        'Deleted expense ৳${e.amount.toInt()} (${e.expenseType})',
+                  );
                 },
                 child: ListTile(
                   title: Text(e.expenseType),

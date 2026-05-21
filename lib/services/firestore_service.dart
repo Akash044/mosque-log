@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../core/constants.dart';
+import '../models/audit_log.dart';
 import '../models/expense.dart';
 import '../models/income.dart';
 import '../models/person.dart';
@@ -114,4 +115,36 @@ class FirestoreService {
   }
 
   Future<void> deleteExpense(String id) => _expenseRef.doc(id).delete();
+
+  // ---------- Audit log ----------
+
+  CollectionReference<Map<String, dynamic>> get _auditRef =>
+      _db.collection('audit_logs');
+
+  Stream<List<AuditLog>> auditLogsStream({int limit = 200}) {
+    return _auditRef
+        .orderBy('timestamp', descending: true)
+        .limit(limit)
+        .snapshots()
+        .map((snap) => snap.docs.map(AuditLog.fromFirestore).toList());
+  }
+
+  Future<void> writeAuditLog({
+    required String userId,
+    required String userEmail,
+    required String action,
+    required String entityType,
+    String? entityId,
+    required String summary,
+  }) async {
+    await _auditRef.add({
+      'userId': userId,
+      'userEmail': userEmail,
+      'action': action,
+      'entityType': entityType,
+      'entityId': entityId,
+      'summary': summary,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+  }
 }

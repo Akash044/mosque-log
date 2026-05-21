@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/audit.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/firestore_provider.dart';
 
@@ -27,9 +28,16 @@ class _AddPersonDialogState extends ConsumerState<AddPersonDialog> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
-    await ref
+    final id = await ref
         .read(firestoreServiceProvider)
         .addPerson(name: _name.text, phone: _phone.text);
+    await logAudit(
+      ref,
+      action: 'create',
+      entityType: 'person',
+      entityId: id,
+      summary: 'Added person: ${_name.text.trim()} (${_phone.text.trim()})',
+    );
     if (mounted) Navigator.of(context).pop(true);
   }
 

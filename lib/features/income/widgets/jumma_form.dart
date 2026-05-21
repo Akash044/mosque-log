@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/formatters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
+import '../../../core/audit.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
 import '../../../widgets/friday_date_picker.dart';
@@ -58,7 +59,7 @@ class _JummaFormState extends ConsumerState<JummaForm> {
     }
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
-    await ref.read(firestoreServiceProvider).addIncome(Income(
+    final docId = await ref.read(firestoreServiceProvider).addIncome(Income(
           id: '',
           type: IncomeType.jumma,
           amount: amount,
@@ -66,6 +67,14 @@ class _JummaFormState extends ConsumerState<JummaForm> {
           createdBy: uid,
           createdAt: DateTime.now(),
         ));
+    await logAudit(
+      ref,
+      action: 'create',
+      entityType: 'income.jumma',
+      entityId: docId,
+      summary:
+          'Added Jumma collection ৳${amount.toInt()} on ${_date!.toIso8601String().substring(0, 10)}',
+    );
     if (!mounted) return;
     _amount.clear();
     setState(() {

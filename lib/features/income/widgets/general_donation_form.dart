@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/audit.dart';
 import '../../../core/formatters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
@@ -70,7 +71,17 @@ class _GeneralDonationFormState extends ConsumerState<GeneralDonationForm> {
       createdBy: uid,
       createdAt: now,
     );
-    await ref.read(firestoreServiceProvider).addIncome(income);
+    final docId =
+        await ref.read(firestoreServiceProvider).addIncome(income);
+    final donor = income.donorName ?? 'Anonymous';
+    await logAudit(
+      ref,
+      action: 'create',
+      entityType: 'income.general',
+      entityId: docId,
+      summary:
+          'Added general donation ৳${income.amount.toInt()} from $donor',
+    );
     if (!mounted) return;
     _donor.clear();
     _amount.clear();

@@ -5,6 +5,7 @@ import '../../../core/constants.dart';
 import '../../../core/formatters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
+import '../../../core/audit.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
 import 'income_history_list.dart';
@@ -54,7 +55,7 @@ class _EidFormState extends ConsumerState<EidForm> {
     if (amount == null || amount <= 0) return;
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
-    await ref.read(firestoreServiceProvider).addIncome(Income(
+    final docId = await ref.read(firestoreServiceProvider).addIncome(Income(
           id: '',
           type: IncomeType.eid,
           amount: amount,
@@ -63,6 +64,13 @@ class _EidFormState extends ConsumerState<EidForm> {
           createdBy: uid,
           createdAt: DateTime.now(),
         ));
+    await logAudit(
+      ref,
+      action: 'create',
+      entityType: 'income.eid',
+      entityId: docId,
+      summary: 'Added ${_eidType ?? "Eid"} collection ৳${amount.toInt()}',
+    );
     if (!mounted) return;
     _amount.clear();
     setState(() {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/audit.dart';
 import '../../../core/constants.dart';
 import '../../../core/formatters.dart';
 import '../../../l10n/app_localizations.dart';
@@ -68,14 +69,22 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
     if (amount == null || amount <= 0) return;
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
-    await ref.read(firestoreServiceProvider).addExpense(Expense(
-          id: '',
-          expenseType: _expenseType!,
-          amount: amount,
-          date: _date,
-          createdBy: uid,
-          createdAt: DateTime.now(),
-        ));
+    final docId =
+        await ref.read(firestoreServiceProvider).addExpense(Expense(
+              id: '',
+              expenseType: _expenseType!,
+              amount: amount,
+              date: _date,
+              createdBy: uid,
+              createdAt: DateTime.now(),
+            ));
+    await logAudit(
+      ref,
+      action: 'create',
+      entityType: 'expense',
+      entityId: docId,
+      summary: 'Added expense ৳${amount.toInt()} ($_expenseType)',
+    );
     if (mounted) Navigator.of(context).pop(true);
   }
 

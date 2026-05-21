@@ -23,7 +23,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBeUwJPyWvfAgFmhkzmVFDTm5et1q4lVOQ',
-    appId: '1:255546289414:android:9c11c4be5730e02a0d4287',
+    appId: '1:255546289414:android:4bacea98642db8fa0d4287',
     messagingSenderId: '255546289414',
     projectId: 'mosque-log',
     storageBucket: 'mosque-log.firebasestorage.app',

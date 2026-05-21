@@ -1,8 +1,17 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Any signed-in user can read/write. For tighter control, keep an
-    // admins/{uid} doc and require it to exist for writes.
+    // Audit logs are append-only and only authenticated users can read them.
+    // They are never editable or deletable from clients.
+    match /audit_logs/{logId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
+
+    // Everything else: any signed-in admin can read/write. For tighter
+    // control, keep an admins/{uid} doc and check existence here.
     match /{document=**} {
       allow read, write: if request.auth != null;
     }

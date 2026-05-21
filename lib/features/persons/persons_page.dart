@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../core/audit.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/person.dart';
 import '../../providers/firestore_provider.dart';
@@ -100,7 +101,16 @@ class _PersonTile extends ConsumerWidget {
             ) ??
             false;
       },
-      onDismissed: (_) => service.deletePerson(person.id),
+      onDismissed: (_) async {
+        await service.deletePerson(person.id);
+        await logAudit(
+          ref,
+          action: 'delete',
+          entityType: 'person',
+          entityId: person.id,
+          summary: 'Deleted person: ${person.name}',
+        );
+      },
       child: ListTile(
         leading: CircleAvatar(
           child: Text(
@@ -123,7 +133,17 @@ class _PersonTile extends ConsumerWidget {
               ),
             Switch(
               value: person.active,
-              onChanged: (v) => service.setPersonActive(person.id, v),
+              onChanged: (v) async {
+                await service.setPersonActive(person.id, v);
+                await logAudit(
+                  ref,
+                  action: 'update',
+                  entityType: 'person',
+                  entityId: person.id,
+                  summary:
+                      'Marked ${person.name} as ${v ? "active" : "inactive"}',
+                );
+              },
             ),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/audit.dart';
 import '../../../core/formatters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
@@ -224,8 +225,17 @@ class IncomeTile extends ConsumerWidget {
             ) ??
             false;
       },
-      onDismissed: (_) =>
-          ref.read(firestoreServiceProvider).deleteIncome(income.id),
+      onDismissed: (_) async {
+        await ref.read(firestoreServiceProvider).deleteIncome(income.id);
+        await logAudit(
+          ref,
+          action: 'delete',
+          entityType: 'income.${income.type.key}',
+          entityId: income.id,
+          summary:
+              'Deleted ${income.type.key} entry ৳${income.amount.toInt()} (${income.date.toIso8601String().substring(0, 10)})',
+        );
+      },
       child: ListTile(
         title: Text(
           title,

@@ -5,6 +5,7 @@ import '../../../core/formatters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
 import '../../../models/person.dart';
+import '../../../core/audit.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
 import '../../../providers/person_provider.dart';
@@ -56,7 +57,7 @@ class _RamadanFormState extends ConsumerState<RamadanForm> {
     if (amount == null || amount <= 0) return;
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
-    await ref.read(firestoreServiceProvider).addIncome(Income(
+    final docId = await ref.read(firestoreServiceProvider).addIncome(Income(
           id: '',
           type: IncomeType.ramadan,
           amount: amount,
@@ -66,6 +67,13 @@ class _RamadanFormState extends ConsumerState<RamadanForm> {
           createdBy: uid,
           createdAt: DateTime.now(),
         ));
+    await logAudit(
+      ref,
+      action: 'create',
+      entityType: 'income.ramadan',
+      entityId: docId,
+      summary: 'Added Ramadan payment ৳${amount.toInt()} from ${_person!.name}',
+    );
     if (!mounted) return;
     _amount.clear();
     _note.clear();

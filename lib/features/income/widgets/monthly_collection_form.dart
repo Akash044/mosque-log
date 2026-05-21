@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
 import '../../../models/person.dart';
+import '../../../core/audit.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
 import '../../../providers/income_provider.dart';
@@ -52,16 +53,25 @@ class _MonthlyCollectionFormState
     if (amount == null || amount <= 0) return;
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
-    await ref.read(firestoreServiceProvider).addIncome(Income(
+    final sortedMonths = _months.toList()..sort();
+    final docId = await ref.read(firestoreServiceProvider).addIncome(Income(
           id: '',
           type: IncomeType.monthly,
           amount: amount,
           date: DateTime.now(),
           personId: _person!.id,
-          months: _months.toList()..sort(),
+          months: sortedMonths,
           createdBy: uid,
           createdAt: DateTime.now(),
         ));
+    await logAudit(
+      ref,
+      action: 'create',
+      entityType: 'income.monthly',
+      entityId: docId,
+      summary:
+          'Added monthly payment ৳${amount.toInt()} from ${_person!.name} for ${sortedMonths.join(", ")}',
+    );
     if (!mounted) return;
     _amount.clear();
     setState(() {
