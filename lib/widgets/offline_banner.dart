@@ -27,26 +27,26 @@ class OfflineBanner extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
     return Material(
       color: scheme.errorContainer,
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          child: Row(
-            children: [
-              Icon(Icons.cloud_off,
-                  size: 18, color: scheme.onErrorContainer),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  l.offlineBanner,
-                  style: TextStyle(
-                    color: scheme.onErrorContainer,
-                    fontSize: 13,
-                  ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+        child: Row(
+          children: [
+            Icon(Icons.cloud_off,
+                size: 14, color: scheme.onErrorContainer),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                l.offlineBanner,
+                style: TextStyle(
+                  color: scheme.onErrorContainer,
+                  fontSize: 11.5,
+                  height: 1.2,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

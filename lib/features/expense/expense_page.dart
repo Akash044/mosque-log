@@ -210,7 +210,12 @@ class _ExpenseList extends ConsumerWidget {
                 },
                 child: ListTile(
                   title: Text(e.expenseType),
-                  subtitle: Text(Formatters.date(context, e.date)),
+                  subtitle: Text(
+                    (e.note?.trim().isNotEmpty ?? false)
+                        ? '${Formatters.date(context, e.date)}\n${e.note!}'
+                        : Formatters.date(context, e.date),
+                  ),
+                  isThreeLine: e.note?.trim().isNotEmpty ?? false,
                   trailing: Text(
                     Formatters.currency(context, e.amount),
                     style: Theme.of(context)

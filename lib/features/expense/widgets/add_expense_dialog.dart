@@ -23,6 +23,7 @@ class AddExpenseDialog extends ConsumerStatefulWidget {
 class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
   final _formKey = GlobalKey<FormState>();
   final _amount = TextEditingController();
+  final _note = TextEditingController();
   String? _expenseType;
   late DateTime _date;
   bool _saving = false;
@@ -36,6 +37,7 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
   @override
   void dispose() {
     _amount.dispose();
+    _note.dispose();
     super.dispose();
   }
 
@@ -70,12 +72,14 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
     if (amount == null || amount <= 0) return;
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
+    final noteText = _note.text.trim();
     final docId =
         await ref.read(firestoreServiceProvider).addExpense(Expense(
               id: '',
               expenseType: _expenseType!,
               amount: amount,
               date: _date,
+              note: noteText.isEmpty ? null : noteText,
               createdBy: uid,
               createdAt: DateTime.now(),
             ));
@@ -95,6 +99,10 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
     final l = AppLocalizations.of(context);
     return AlertDialog(
       title: Text(l.addExpense),
+      insetPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      contentPadding:
+          const EdgeInsets.fromLTRB(20, 16, 20, 0),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -141,6 +149,13 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
                   if (n == null || n <= 0) return l.amountInvalid;
                   return null;
                 },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _note,
+                maxLines: 3,
+                minLines: 1,
+                decoration: InputDecoration(labelText: l.noteOptional),
               ),
             ],
           ),

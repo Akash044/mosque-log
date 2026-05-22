@@ -40,15 +40,28 @@ class MosqueApp extends ConsumerWidget {
       ],
       routerConfig: router,
       debugShowCheckedModeBanner: false,
-      builder: (context, child) => Stack(
-        children: [
-          child ?? const SizedBox.shrink(),
-          const Align(
-            alignment: Alignment.topCenter,
-            child: OfflineBanner(),
-          ),
-        ],
-      ),
+      builder: (context, child) {
+        // Layout the banner above the route content. When online the banner
+        // renders as SizedBox.shrink() so it costs zero vertical space.
+        // SafeArea handles the status bar inset; removePadding below stops
+        // the nested Scaffold from adding it a second time.
+        return Column(
+          children: [
+            SafeArea(
+              top: true,
+              bottom: false,
+              child: const OfflineBanner(),
+            ),
+            Expanded(
+              child: MediaQuery.removePadding(
+                context: context,
+                removeTop: true,
+                child: child ?? const SizedBox.shrink(),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

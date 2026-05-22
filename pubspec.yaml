@@ -28,6 +28,7 @@ dependencies:
   url_launcher: ^6.3.1
   share_plus: ^10.1.4
   connectivity_plus: ^6.1.0
+  audioplayers: ^6.1.0
 
   cupertino_icons: ^1.0.8
 
@@ -40,6 +41,8 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+    - assets/sounds/
 
 flutter_launcher_icons:
   android: true

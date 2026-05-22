@@ -137,12 +137,13 @@ class _ReportPageState extends ConsumerState<ReportPage> {
   String _buildExpenseCsv(List<Expense> rows) {
     final df = DateFormat('yyyy-MM-dd');
     final buf = StringBuffer();
-    buf.writeln('date,type,amount');
+    buf.writeln('date,type,amount,note');
     for (final e in rows) {
       buf.writeln([
         df.format(e.date),
         _csv(e.expenseType),
         e.amount,
+        _csv(e.note),
       ].join(','));
     }
     return buf.toString();
