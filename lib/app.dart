@@ -15,6 +15,7 @@ import 'l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
 import 'providers/settings_provider.dart';
 import 'widgets/app_shell.dart';
+import 'widgets/offline_banner.dart';
 
 class MosqueApp extends ConsumerWidget {
   const MosqueApp({super.key});
@@ -39,6 +40,15 @@ class MosqueApp extends ConsumerWidget {
       ],
       routerConfig: router,
       debugShowCheckedModeBanner: false,
+      builder: (context, child) => Stack(
+        children: [
+          child ?? const SizedBox.shrink(),
+          const Align(
+            alignment: Alignment.topCenter,
+            child: OfflineBanner(),
+          ),
+        ],
+      ),
     );
   }
 }

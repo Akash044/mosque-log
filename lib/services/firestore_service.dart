@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../core/constants.dart';
@@ -24,21 +26,31 @@ class FirestoreService {
     });
   }
 
+  // All mutation methods below are intentionally "fire-and-forget": Firestore
+  // commits to the local cache synchronously, but the Future returned by
+  // set/update/delete only resolves once the server acknowledges the write.
+  // When the device is offline that Future never completes, which would hang
+  // any caller that awaits it. We unawait the network confirmation and rely
+  // on Firestore's built-in offline queue to sync when connectivity returns.
+
   Future<String> addPerson({required String name, String? phone}) async {
-    final doc = await _personsRef.add({
+    final doc = _personsRef.doc();
+    unawaited(doc.set({
       'name': name.trim(),
       'phone': (phone == null || phone.trim().isEmpty) ? null : phone.trim(),
       'active': true,
       'createdAt': Timestamp.now(),
-    });
+    }));
     return doc.id;
   }
 
-  Future<void> setPersonActive(String id, bool active) {
-    return _personsRef.doc(id).update({'active': active});
+  Future<void> setPersonActive(String id, bool active) async {
+    unawaited(_personsRef.doc(id).update({'active': active}));
   }
 
-  Future<void> deletePerson(String id) => _personsRef.doc(id).delete();
+  Future<void> deletePerson(String id) async {
+    unawaited(_personsRef.doc(id).delete());
+  }
 
   // ---------- Income ----------
 
@@ -82,11 +94,14 @@ class FirestoreService {
   }
 
   Future<String> addIncome(Income income) async {
-    final doc = await _incomeRef.add(income.toFirestore());
+    final doc = _incomeRef.doc();
+    unawaited(doc.set(income.toFirestore()));
     return doc.id;
   }
 
-  Future<void> deleteIncome(String id) => _incomeRef.doc(id).delete();
+  Future<void> deleteIncome(String id) async {
+    unawaited(_incomeRef.doc(id).delete());
+  }
 
   // ---------- Expenses ----------
 
@@ -110,11 +125,14 @@ class FirestoreService {
   }
 
   Future<String> addExpense(Expense expense) async {
-    final doc = await _expenseRef.add(expense.toFirestore());
+    final doc = _expenseRef.doc();
+    unawaited(doc.set(expense.toFirestore()));
     return doc.id;
   }
 
-  Future<void> deleteExpense(String id) => _expenseRef.doc(id).delete();
+  Future<void> deleteExpense(String id) async {
+    unawaited(_expenseRef.doc(id).delete());
+  }
 
   // ---------- Audit log ----------
 
@@ -137,7 +155,7 @@ class FirestoreService {
     String? entityId,
     required String summary,
   }) async {
-    await _auditRef.add({
+    unawaited(_auditRef.add({
       'userId': userId,
       'userEmail': userEmail,
       'action': action,
@@ -145,6 +163,6 @@ class FirestoreService {
       'entityId': entityId,
       'summary': summary,
       'timestamp': FieldValue.serverTimestamp(),
-    });
+    }));
   }
 }

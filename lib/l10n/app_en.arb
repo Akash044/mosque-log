@@ -70,6 +70,7 @@
   "generalAmountOrQty": "Enter at least an amount or a quantity",
 
   "fridayOnly": "Pick a Friday",
+  "jummaDuplicate": "Jumma already recorded for this date",
   "selectDate": "Select date",
 
   "person": "Person",
@@ -119,6 +120,7 @@
   "incomeBreakdown": "Income breakdown",
   "exportCsv": "Export CSV",
   "exportEmpty": "Nothing to export in this range",
+  "offlineBanner": "Offline — changes will sync when you reconnect",
   "noData": "No data for this period",
 
   "amountRequired": "Amount is required",

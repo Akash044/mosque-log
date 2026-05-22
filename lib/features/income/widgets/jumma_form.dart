@@ -7,6 +7,7 @@ import '../../../models/income.dart';
 import '../../../core/audit.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
+import '../../../providers/income_provider.dart';
 import '../../../widgets/friday_date_picker.dart';
 import 'income_history_list.dart';
 
@@ -55,6 +56,18 @@ class _JummaFormState extends ConsumerState<JummaForm> {
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(l.amountInvalid)));
+      return;
+    }
+    // Block duplicates for the same Friday.
+    final existing = ref.read(incomeProvider).value ?? const <Income>[];
+    final dupe = existing.any((i) =>
+        i.type == IncomeType.jumma &&
+        i.date.year == _date!.year &&
+        i.date.month == _date!.month &&
+        i.date.day == _date!.day);
+    if (dupe) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l.jummaDuplicate)));
       return;
     }
     setState(() => _saving = true);
