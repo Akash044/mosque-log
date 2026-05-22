@@ -6,6 +6,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
 import '../../../models/person.dart';
 import '../../../core/audit.dart';
+import '../../../core/feedback.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
 import '../../../providers/person_provider.dart';
@@ -74,6 +75,7 @@ class _RamadanFormState extends ConsumerState<RamadanForm> {
       entityId: docId,
       summary: 'Added Ramadan payment ৳${amount.toInt()} from ${_person!.name}',
     );
+    playEntryAdded(ref);
     if (!mounted) return;
     _amount.clear();
     _note.clear();

@@ -83,6 +83,16 @@ class SettingsPage extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
+                Card(
+                  child: SwitchListTile(
+                    secondary: const Icon(Icons.volume_up_outlined),
+                    title: Text(l.settingsSounds),
+                    subtitle: Text(l.settingsSoundsDesc),
+                    value: settings.soundsEnabled,
+                    onChanged: controller.setSoundsEnabled,
+                  ),
+                ),
+                const SizedBox(height: 12),
                 const _AuditLogSection(),
                 const SizedBox(height: 24),
                 FilledButton.tonalIcon(

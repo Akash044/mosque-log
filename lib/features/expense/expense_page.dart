@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/audit.dart';
+import '../../core/feedback.dart';
 import '../../core/formatters.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/expense.dart';
@@ -205,6 +206,7 @@ class _ExpenseList extends ConsumerWidget {
                     summary:
                         'Deleted expense ৳${e.amount.toInt()} (${e.expenseType})',
                   );
+                  playEntryDeleted(ref);
                 },
                 child: ListTile(
                   title: Text(e.expenseType),

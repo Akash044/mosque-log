@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/audit.dart';
+import '../../../core/feedback.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/firestore_provider.dart';
 
@@ -38,6 +39,7 @@ class _AddPersonDialogState extends ConsumerState<AddPersonDialog> {
       entityId: id,
       summary: 'Added person: ${_name.text.trim()} (${_phone.text.trim()})',
     );
+    playEntryAdded(ref);
     if (mounted) Navigator.of(context).pop(true);
   }
 

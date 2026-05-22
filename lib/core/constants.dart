@@ -12,6 +12,7 @@ class AppConstants {
   // SharedPreferences keys
   static const prefLocale = 'pref_locale';
   static const prefThemeMode = 'pref_theme_mode';
+  static const prefSoundsEnabled = 'pref_sounds_enabled';
 
   // Default expense types used when no custom list is configured
   static const defaultExpenseTypes = <String>[
@@ -23,6 +24,10 @@ class AppConstants {
     'Cleaning',
     'Gas Bill',
     'Construction',
+    'Transportation',
+    'Sound System',
+    'Repairs',
+    'Books',
     'Other',
   ];
 

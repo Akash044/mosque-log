@@ -5,6 +5,7 @@ import '../../../core/formatters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
 import '../../../core/audit.dart';
+import '../../../core/feedback.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
 import '../../../providers/income_provider.dart';
@@ -88,6 +89,7 @@ class _JummaFormState extends ConsumerState<JummaForm> {
       summary:
           'Added Jumma collection ৳${amount.toInt()} on ${_date!.toIso8601String().substring(0, 10)}',
     );
+    playEntryAdded(ref);
     if (!mounted) return;
     _amount.clear();
     setState(() {

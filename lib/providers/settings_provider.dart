@@ -27,6 +27,11 @@ class SettingsNotifier extends StateNotifier<AppSettings> {
     state = state.copyWith(themeMode: mode);
     await _service.saveThemeMode(mode);
   }
+
+  Future<void> setSoundsEnabled(bool enabled) async {
+    state = state.copyWith(soundsEnabled: enabled);
+    await _service.saveSoundsEnabled(enabled);
+  }
 }
 
 final settingsProvider =

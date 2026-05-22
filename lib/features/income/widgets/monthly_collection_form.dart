@@ -5,6 +5,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
 import '../../../models/person.dart';
 import '../../../core/audit.dart';
+import '../../../core/feedback.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
 import '../../../providers/income_provider.dart';
@@ -72,6 +73,7 @@ class _MonthlyCollectionFormState
       summary:
           'Added monthly payment ৳${amount.toInt()} from ${_person!.name} for ${sortedMonths.join(", ")}',
     );
+    playEntryAdded(ref);
     if (!mounted) return;
     _amount.clear();
     setState(() {

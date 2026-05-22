@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/audit.dart';
+import '../../../core/feedback.dart';
 import '../../../core/formatters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
@@ -235,6 +236,7 @@ class IncomeTile extends ConsumerWidget {
           summary:
               'Deleted ${income.type.key} entry ৳${income.amount.toInt()} (${income.date.toIso8601String().substring(0, 10)})',
         );
+        playEntryDeleted(ref);
       },
       child: ListTile(
         title: Text(

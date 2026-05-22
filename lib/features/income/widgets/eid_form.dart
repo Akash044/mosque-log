@@ -6,6 +6,7 @@ import '../../../core/formatters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/income.dart';
 import '../../../core/audit.dart';
+import '../../../core/feedback.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
 import 'income_history_list.dart';
@@ -71,6 +72,7 @@ class _EidFormState extends ConsumerState<EidForm> {
       entityId: docId,
       summary: 'Added ${_eidType ?? "Eid"} collection ৳${amount.toInt()}',
     );
+    playEntryAdded(ref);
     if (!mounted) return;
     _amount.clear();
     setState(() {

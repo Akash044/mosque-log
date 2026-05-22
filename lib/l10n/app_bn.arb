@@ -37,6 +37,8 @@
 
   "settingsLanguage": "ভাষা",
   "settingsTheme": "থিম",
+  "settingsSounds": "শব্দ",
+  "settingsSoundsDesc": "এন্ট্রি যোগ বা মুছলে ক্লিক শব্দ বাজবে",
   "themeSystem": "সিস্টেম",
   "themeLight": "লাইট",
   "themeDark": "ডার্ক",

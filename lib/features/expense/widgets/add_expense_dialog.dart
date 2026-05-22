@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/audit.dart';
 import '../../../core/constants.dart';
+import '../../../core/feedback.dart';
 import '../../../core/formatters.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/expense.dart';
@@ -85,6 +86,7 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
       entityId: docId,
       summary: 'Added expense ৳${amount.toInt()} ($_expenseType)',
     );
+    playEntryAdded(ref);
     if (mounted) Navigator.of(context).pop(true);
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/audit.dart';
+import '../../core/feedback.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/person.dart';
 import '../../providers/firestore_provider.dart';
@@ -110,6 +111,7 @@ class _PersonTile extends ConsumerWidget {
           entityId: person.id,
           summary: 'Deleted person: ${person.name}',
         );
+        playEntryDeleted(ref);
       },
       child: ListTile(
         leading: CircleAvatar(

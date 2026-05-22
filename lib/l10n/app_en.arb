@@ -37,6 +37,8 @@
 
   "settingsLanguage": "Language",
   "settingsTheme": "Theme",
+  "settingsSounds": "Sounds",
+  "settingsSoundsDesc": "Play a click when you add or delete an entry",
   "themeSystem": "System",
   "themeLight": "Light",
   "themeDark": "Dark",
