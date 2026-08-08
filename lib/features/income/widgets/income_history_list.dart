@@ -144,6 +144,8 @@ class IncomeTile extends ConsumerWidget {
         return _eidLabel(context, income.eidType);
       case IncomeType.ramadan:
         return personsById[income.personId]?.name ?? l.unknown;
+      case IncomeType.daily:
+        return l.incomeDaily;
     }
   }
 
@@ -184,6 +186,12 @@ class IncomeTile extends ConsumerWidget {
           return '$dateStr\n$note';
         }
         return dateStr;
+      case IncomeType.daily:
+        final note = income.note?.trim();
+        if (note != null && note.isNotEmpty) {
+          return '$dateStr\n$note';
+        }
+        return dateStr;
     }
   }
 
@@ -196,7 +204,8 @@ class IncomeTile extends ConsumerWidget {
     final isThreeLine =
         (income.type == IncomeType.monthly && income.months.isNotEmpty) ||
             (income.type == IncomeType.general && hasNote) ||
-            (income.type == IncomeType.ramadan && hasNote);
+            (income.type == IncomeType.ramadan && hasNote) ||
+            (income.type == IncomeType.daily && hasNote);
 
     return Dismissible(
       key: ValueKey(income.id),

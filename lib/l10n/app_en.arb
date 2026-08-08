@@ -75,6 +75,8 @@
   "incomeMonthly": "Monthly",
   "incomeEid": "Eid",
   "incomeRamadan": "Ramadan",
+  "incomeDaily": "Daily",
+  "dailyDuplicate": "Daily collection already recorded for this date",
 
   "donorName": "Donor name",
   "note": "Note",

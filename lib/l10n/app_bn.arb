@@ -75,6 +75,8 @@
   "incomeMonthly": "মাসিক",
   "incomeEid": "ঈদ",
   "incomeRamadan": "রমজান",
+  "incomeDaily": "দৈনিক",
+  "dailyDuplicate": "এই তারিখের দৈনিক আয় ইতিমধ্যে রেকর্ড করা হয়েছে",
 
   "donorName": "দাতার নাম",
   "note": "নোট",

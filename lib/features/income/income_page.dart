@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../widgets/settings_action.dart';
+import 'widgets/daily_form.dart';
 import 'widgets/due_persons_sheet.dart';
 import 'widgets/eid_form.dart';
 import 'widgets/general_donation_form.dart';
@@ -24,7 +25,7 @@ class _IncomePageState extends State<IncomePage>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 5, vsync: this);
+    _tab = TabController(length: 6, vsync: this);
     _tab.addListener(() => setState(() {}));
   }
 
@@ -71,6 +72,7 @@ class _IncomePageState extends State<IncomePage>
             Tab(text: l.incomeMonthly),
             Tab(text: l.incomeEid),
             Tab(text: l.incomeRamadan),
+            Tab(text: l.incomeDaily),
           ],
         ),
       ),
@@ -82,6 +84,7 @@ class _IncomePageState extends State<IncomePage>
           MonthlyCollectionForm(),
           EidForm(),
           RamadanForm(),
+          DailyForm(),
         ],
       ),
     );
