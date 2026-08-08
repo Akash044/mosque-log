@@ -9,6 +9,7 @@ import '../../../core/audit.dart';
 import '../../../core/feedback.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
+import '../../../providers/mosque_provider.dart';
 import 'income_history_list.dart';
 
 class EidForm extends ConsumerStatefulWidget {
@@ -56,8 +57,10 @@ class _EidFormState extends ConsumerState<EidForm> {
     if (amount == null || amount <= 0) return;
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
+    final mosqueId = ref.read(currentMosqueIdProvider) ?? '';
     final docId = await ref.read(firestoreServiceProvider).addIncome(Income(
           id: '',
+          mosqueId: mosqueId,
           type: IncomeType.eid,
           amount: amount,
           date: _date,

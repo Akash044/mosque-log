@@ -1,41 +1,40 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Person {
+class Mosque {
   final String id;
-  final String mosqueId;
   final String name;
+  final String address;
   final String? phone;
-  final bool active;
+  final String createdBy;
   final DateTime createdAt;
 
-  const Person({
+  const Mosque({
     required this.id,
-    required this.mosqueId,
     required this.name,
+    required this.address,
     this.phone,
-    this.active = true,
+    required this.createdBy,
     required this.createdAt,
   });
 
-  factory Person.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory Mosque.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
     final d = doc.data() ?? {};
-    return Person(
+    return Mosque(
       id: doc.id,
-      mosqueId: (d['mosqueId'] as String?) ?? '',
       name: (d['name'] as String?) ?? '',
+      address: (d['address'] as String?) ?? '',
       phone: d['phone'] as String?,
-      active: (d['active'] as bool?) ?? true,
-      createdAt:
-          (d['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      createdBy: (d['createdBy'] as String?) ?? '',
+      createdAt: (d['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
   }
 
   Map<String, dynamic> toFirestore() {
     return {
-      'mosqueId': mosqueId,
       'name': name,
+      'address': address,
       'phone': phone,
-      'active': active,
+      'createdBy': createdBy,
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }

@@ -1,19 +1,72 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Audit logs are append-only and only authenticated users can read them.
-    // They are never editable or deletable from clients.
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // The mosqueId of the currently-signed-in admin, looked up from their
+    // own profile doc. Costs an extra read per request but keeps every
+    // other rule below to a single equality check.
+    function userMosqueId() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.mosqueId;
+    }
+
+    function ownsMosque(mosqueId) {
+      return signedIn() && userMosqueId() == mosqueId;
+    }
+
+    // A mosque is created together with its admin's users/{uid} doc in a
+    // single client-side batch (see RegistrationService). The !exists()
+    // check is evaluated against pre-batch state, so it correctly allows a
+    // brand-new signup while blocking an already-onboarded admin from
+    // creating extra, unowned mosque docs.
+    match /mosques/{mosqueId} {
+      allow create: if signedIn()
+                    && !exists(/databases/$(database)/documents/users/$(request.auth.uid));
+      allow read, update: if ownsMosque(mosqueId);
+      allow delete: if false;
+    }
+
+    // A user's own profile: created once at registration, uid-keyed so a
+    // user can only ever touch their own doc. mosqueId/role are set at
+    // creation and never changed afterwards (no multi-admin/role changes
+    // in v1).
+    match /users/{uid} {
+      allow create: if signedIn() && request.auth.uid == uid;
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow update: if signedIn() && request.auth.uid == uid
+                    && request.resource.data.mosqueId == resource.data.mosqueId
+                    && request.resource.data.role == resource.data.role;
+      allow delete: if false;
+    }
+
+    // Audit logs are append-only and only readable by the mosque that owns
+    // them. They are never editable or deletable from clients.
     match /audit_logs/{logId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null
-                    && request.resource.data.userId == request.auth.uid;
+      allow read: if ownsMosque(resource.data.mosqueId);
+      allow create: if signedIn()
+                    && request.resource.data.userId == request.auth.uid
+                    && ownsMosque(request.resource.data.mosqueId);
       allow update, delete: if false;
     }
 
-    // Everything else: any signed-in admin can read/write. For tighter
-    // control, keep an admins/{uid} doc and check existence here.
-    match /{document=**} {
-      allow read, write: if request.auth != null;
+    // Everyday data — every doc must belong to the signed-in admin's mosque,
+    // both to read it and to write it.
+    match /persons/{id} {
+      allow read, update, delete: if ownsMosque(resource.data.mosqueId);
+      allow create: if ownsMosque(request.resource.data.mosqueId);
+    }
+
+    match /income/{id} {
+      allow read, update, delete: if ownsMosque(resource.data.mosqueId);
+      allow create: if ownsMosque(request.resource.data.mosqueId);
+    }
+
+    match /expenses/{id} {
+      allow read, update, delete: if ownsMosque(resource.data.mosqueId);
+      allow create: if ownsMosque(request.resource.data.mosqueId);
     }
   }
 }

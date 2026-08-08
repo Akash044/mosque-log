@@ -1,0 +1,9 @@
+{
+  "name": "mosque-expense-tracker-scripts",
+  "private": true,
+  "version": "1.0.0",
+  "description": "One-off admin scripts for the mosque expense tracker's Firestore data (not part of the Flutter app).",
+  "dependencies": {
+    "firebase-admin": "^12.6.0"
+  }
+}

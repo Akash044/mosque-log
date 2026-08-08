@@ -9,6 +9,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../models/expense.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
+import '../../../providers/mosque_provider.dart';
 import 'calculator_dialog.dart';
 
 class AddExpenseDialog extends ConsumerStatefulWidget {
@@ -72,10 +73,12 @@ class _AddExpenseDialogState extends ConsumerState<AddExpenseDialog> {
     if (amount == null || amount <= 0) return;
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
+    final mosqueId = ref.read(currentMosqueIdProvider) ?? '';
     final noteText = _note.text.trim();
     final docId =
         await ref.read(firestoreServiceProvider).addExpense(Expense(
               id: '',
+              mosqueId: mosqueId,
               expenseType: _expenseType!,
               amount: amount,
               date: _date,

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// deleted (enforced by Firestore rules).
 class AuditLog {
   final String id;
+  final String mosqueId;
   final String userId;
   final String userEmail;
   final String action; // 'create' | 'update' | 'delete'
@@ -14,6 +15,7 @@ class AuditLog {
 
   const AuditLog({
     required this.id,
+    required this.mosqueId,
     required this.userId,
     required this.userEmail,
     required this.action,
@@ -28,6 +30,7 @@ class AuditLog {
     final d = doc.data() ?? {};
     return AuditLog(
       id: doc.id,
+      mosqueId: (d['mosqueId'] as String?) ?? '',
       userId: (d['userId'] as String?) ?? '',
       userEmail: (d['userEmail'] as String?) ?? '',
       action: (d['action'] as String?) ?? '',

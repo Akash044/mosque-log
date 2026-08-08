@@ -5,6 +5,7 @@ import '../../../core/audit.dart';
 import '../../../core/feedback.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../providers/firestore_provider.dart';
+import '../../../providers/mosque_provider.dart';
 
 class AddPersonDialog extends ConsumerStatefulWidget {
   const AddPersonDialog({super.key});
@@ -29,9 +30,10 @@ class _AddPersonDialogState extends ConsumerState<AddPersonDialog> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _saving = true);
+    final mosqueId = ref.read(currentMosqueIdProvider) ?? '';
     final id = await ref
         .read(firestoreServiceProvider)
-        .addPerson(name: _name.text, phone: _phone.text);
+        .addPerson(mosqueId: mosqueId, name: _name.text, phone: _phone.text);
     await logAudit(
       ref,
       action: 'create',

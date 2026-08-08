@@ -4,15 +4,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'core/theme.dart';
+import 'features/auth/finish_registration_page.dart';
 import 'features/auth/login_page.dart';
+import 'features/auth/register_mosque_page.dart';
 import 'features/dashboard/dashboard_page.dart';
 import 'features/expense/expense_page.dart';
 import 'features/income/income_page.dart';
 import 'features/persons/persons_page.dart';
 import 'features/report/report_page.dart';
 import 'features/settings/settings_page.dart';
+import 'features/splash/splash_page.dart';
 import 'l10n/app_localizations.dart';
 import 'providers/auth_provider.dart';
+import 'providers/mosque_provider.dart';
 import 'providers/settings_provider.dart';
 import 'widgets/app_shell.dart';
 import 'widgets/offline_banner.dart';
@@ -68,25 +72,56 @@ class MosqueApp extends ConsumerWidget {
 
 final _routerProvider = Provider<GoRouter>((ref) {
   final auth = ref.watch(authStateProvider);
+  final profile = ref.watch(userProfileProvider);
 
   return GoRouter(
     initialLocation: '/',
     refreshListenable: _AuthRefresh(ref),
     redirect: (context, state) {
+      if (auth.isLoading) return null;
+
       final loggedIn = auth.maybeWhen(
         data: (user) => user != null,
         orElse: () => false,
       );
-      final loggingIn = state.matchedLocation == '/login';
-      if (auth.isLoading) return null;
-      if (!loggedIn) return loggingIn ? null : '/login';
-      if (loggingIn) return '/';
+      final loc = state.matchedLocation;
+      final onLogin = loc == '/login';
+      final onRegister = loc == '/register';
+      final onFinishRegister = loc == '/register-finish';
+      final onSplash = loc == '/splash';
+
+      if (!loggedIn) return (onLogin || onRegister) ? null : '/login';
+
+      // Logged in from here on — mosque/admin profile decides the rest.
+      if (profile.isLoading) {
+        return (onFinishRegister || onSplash) ? null : '/splash';
+      }
+
+      final hasProfile = profile.maybeWhen(
+        data: (p) => p != null,
+        orElse: () => false,
+      );
+      if (!hasProfile) return onFinishRegister ? null : '/register-finish';
+
+      if (onLogin || onRegister || onFinishRegister || onSplash) return '/';
       return null;
     },
     routes: [
       GoRoute(
         path: '/login',
         builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterMosquePage(),
+      ),
+      GoRoute(
+        path: '/register-finish',
+        builder: (context, state) => const FinishRegistrationPage(),
+      ),
+      GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashPage(),
       ),
       GoRoute(
         path: '/settings',
@@ -112,5 +147,6 @@ final _routerProvider = Provider<GoRouter>((ref) {
 class _AuthRefresh extends ChangeNotifier {
   _AuthRefresh(Ref ref) {
     ref.listen(authStateProvider, (_, __) => notifyListeners());
+    ref.listen(userProfileProvider, (_, __) => notifyListeners());
   }
 }

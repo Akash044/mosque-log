@@ -9,6 +9,7 @@ import '../../../core/feedback.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
 import '../../../providers/income_provider.dart';
+import '../../../providers/mosque_provider.dart';
 import '../../../widgets/friday_date_picker.dart';
 import 'income_history_list.dart';
 
@@ -73,8 +74,10 @@ class _JummaFormState extends ConsumerState<JummaForm> {
     }
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
+    final mosqueId = ref.read(currentMosqueIdProvider) ?? '';
     final docId = await ref.read(firestoreServiceProvider).addIncome(Income(
           id: '',
+          mosqueId: mosqueId,
           type: IncomeType.jumma,
           amount: amount,
           date: _date!,

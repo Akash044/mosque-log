@@ -9,6 +9,7 @@ import '../../../core/feedback.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
 import '../../../providers/income_provider.dart';
+import '../../../providers/mosque_provider.dart';
 import '../../../providers/person_provider.dart';
 import '../../../widgets/month_multi_select.dart';
 import 'add_person_dialog.dart';
@@ -54,9 +55,11 @@ class _MonthlyCollectionFormState
     if (amount == null || amount <= 0) return;
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
+    final mosqueId = ref.read(currentMosqueIdProvider) ?? '';
     final sortedMonths = _months.toList()..sort();
     final docId = await ref.read(firestoreServiceProvider).addIncome(Income(
           id: '',
+          mosqueId: mosqueId,
           type: IncomeType.monthly,
           amount: amount,
           date: DateTime.now(),

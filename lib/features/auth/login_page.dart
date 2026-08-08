@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../providers/auth_provider.dart';
@@ -16,7 +17,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _email = TextEditingController();
   final _password = TextEditingController();
-  bool _signup = false;
   bool _loading = false;
 
   @override
@@ -32,17 +32,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final auth = ref.read(authServiceProvider);
     final l = AppLocalizations.of(context);
     try {
-      if (_signup) {
-        await auth.createWithEmail(
-          email: _email.text,
-          password: _password.text,
-        );
-      } else {
-        await auth.signInWithEmail(
-          email: _email.text,
-          password: _password.text,
-        );
-      }
+      await auth.signInWithEmail(
+        email: _email.text,
+        password: _password.text,
+      );
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -126,7 +119,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                               width: 20,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : Text(_signup ? l.createAccount : l.signIn),
+                          : Text(l.signIn),
                     ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
@@ -138,8 +131,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     TextButton(
                       onPressed: _loading
                           ? null
-                          : () => setState(() => _signup = !_signup),
-                      child: Text(_signup ? l.haveAccount : l.noAccount),
+                          : () => context.push('/register'),
+                      child: Text(l.noAccount),
                     ),
                   ],
                 ),

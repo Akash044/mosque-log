@@ -9,6 +9,7 @@ import '../../../core/audit.dart';
 import '../../../core/feedback.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../providers/firestore_provider.dart';
+import '../../../providers/mosque_provider.dart';
 import '../../../providers/person_provider.dart';
 import 'add_person_dialog.dart';
 import 'income_history_list.dart';
@@ -58,8 +59,10 @@ class _RamadanFormState extends ConsumerState<RamadanForm> {
     if (amount == null || amount <= 0) return;
     setState(() => _saving = true);
     final uid = ref.read(authServiceProvider).currentUser?.uid ?? '';
+    final mosqueId = ref.read(currentMosqueIdProvider) ?? '';
     final docId = await ref.read(firestoreServiceProvider).addIncome(Income(
           id: '',
+          mosqueId: mosqueId,
           type: IncomeType.ramadan,
           amount: amount,
           date: _date,

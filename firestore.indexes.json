@@ -1,0 +1,54 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "persons",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "mosqueId", "order": "ASCENDING" },
+        { "fieldPath": "name", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "income",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "mosqueId", "order": "ASCENDING" },
+        { "fieldPath": "date", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "income",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "mosqueId", "order": "ASCENDING" },
+        { "fieldPath": "type", "order": "ASCENDING" },
+        { "fieldPath": "date", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "income",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "mosqueId", "order": "ASCENDING" },
+        { "fieldPath": "months", "arrayConfig": "CONTAINS" }
+      ]
+    },
+    {
+      "collectionGroup": "expenses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "mosqueId", "order": "ASCENDING" },
+        { "fieldPath": "date", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "audit_logs",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "mosqueId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

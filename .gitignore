@@ -98,6 +98,11 @@ lib/l10n/app_localizations*.dart
 # Claude Code per-machine settings
 .claude/settings.local.json
 
+# One-off admin scripts (scripts/migrate-to-mosque.js): never commit the
+# service account key, and skip its local node_modules.
+scripts/serviceAccountKey.json
+scripts/node_modules/
+
 # Exceptions to above rules
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3

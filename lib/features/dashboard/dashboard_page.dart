@@ -6,6 +6,7 @@ import '../../l10n/app_localizations.dart';
 import '../../models/income.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/income_provider.dart';
+import '../../providers/mosque_provider.dart';
 import '../../widgets/language_action.dart';
 import '../../widgets/settings_action.dart';
 import '../../widgets/theme_action.dart';
@@ -138,20 +139,21 @@ class DashboardPage extends ConsumerWidget {
   }
 }
 
-class _MosqueHeader extends StatelessWidget {
+class _MosqueHeader extends ConsumerWidget {
   const _MosqueHeader();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final scheme = Theme.of(context).colorScheme;
+    final mosque = ref.watch(currentMosqueProvider).valueOrNull;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Icon(Icons.mosque, size: 36, color: scheme.primary),
         const SizedBox(height: 6),
         Text(
-          l.mosqueName,
+          mosque?.name ?? l.mosqueName,
           textAlign: TextAlign.center,
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,
@@ -159,7 +161,7 @@ class _MosqueHeader extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          l.mosqueAddress,
+          mosque?.address ?? l.mosqueAddress,
           textAlign: TextAlign.center,
           style: Theme.of(context)
               .textTheme

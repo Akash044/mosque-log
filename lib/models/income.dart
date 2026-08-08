@@ -25,6 +25,7 @@ extension IncomeTypeX on IncomeType {
 
 class Income {
   final String id;
+  final String mosqueId;
   final IncomeType type;
   final double amount;
   final int? quantity;
@@ -39,6 +40,7 @@ class Income {
 
   const Income({
     required this.id,
+    required this.mosqueId,
     required this.type,
     required this.amount,
     this.quantity,
@@ -56,6 +58,7 @@ class Income {
     final d = doc.data() ?? {};
     return Income(
       id: doc.id,
+      mosqueId: (d['mosqueId'] as String?) ?? '',
       type: IncomeTypeX.fromKey(d['type'] as String?),
       amount: (d['amount'] as num?)?.toDouble() ?? 0,
       quantity: (d['quantity'] as num?)?.toInt(),
@@ -75,6 +78,7 @@ class Income {
 
   Map<String, dynamic> toFirestore() {
     return {
+      'mosqueId': mosqueId,
       'type': type.key,
       'amount': amount,
       'quantity': quantity,

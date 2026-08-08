@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Expense {
   final String id;
+  final String mosqueId;
   final String expenseType;
   final double amount;
   final DateTime date;
@@ -11,6 +12,7 @@ class Expense {
 
   const Expense({
     required this.id,
+    required this.mosqueId,
     required this.expenseType,
     required this.amount,
     required this.date,
@@ -23,6 +25,7 @@ class Expense {
     final d = doc.data() ?? {};
     return Expense(
       id: doc.id,
+      mosqueId: (d['mosqueId'] as String?) ?? '',
       expenseType: (d['expenseType'] as String?) ?? '',
       amount: (d['amount'] as num?)?.toDouble() ?? 0,
       date: (d['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
@@ -35,6 +38,7 @@ class Expense {
 
   Map<String, dynamic> toFirestore() {
     return {
+      'mosqueId': mosqueId,
       'expenseType': expenseType,
       'amount': amount,
       'date': Timestamp.fromDate(date),

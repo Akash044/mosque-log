@@ -8,6 +8,9 @@ class AppConstants {
   static const incomeCollection = 'income';
   static const expensesCollection = 'expenses';
   static const expenseTypesCollection = 'expenseTypes';
+  static const auditLogsCollection = 'audit_logs';
+  static const mosquesCollection = 'mosques';
+  static const usersCollection = 'users';
 
   // SharedPreferences keys
   static const prefLocale = 'pref_locale';
